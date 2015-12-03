@@ -9,6 +9,8 @@ class Simulation
     void initialize(void);
     void iterate(double);
 
+    double get_diffusivity(int);
+
     double gradient_forward(int);
     double gradient_backward(int);
 
@@ -18,6 +20,14 @@ public:
     void run();
     
 };
+
+double Simulation::get_diffusivity(int i)
+{
+    // k(T) = k0/2 @ 2500K, K0 at 4500K, linear in between
+    // (purely arbitrary, I know)
+//    return k0;
+    return 0.5*k0 + (T[i]-2500)/2000.*0.5*k0;
+}
 
 void Simulation::initialize(void)
 {
@@ -30,7 +40,7 @@ void Simulation::initialize(void)
         // initialize with a linear gradient from 2000 to 4500 K
         T_new[i] = 2000 + i*2500./num_points;
         T[i] = T_new[i];
-        K[i] = k0;
+        K[i] = get_diffusivity(i);
     }
     // the CMB is kept at 2500 K
     T_new[num_points-1] = 2500;
@@ -47,7 +57,7 @@ double Simulation::thermal_diffusion(int x)
     double prev_radius = dx*(x-1);
 
     // no flux at r=0
-    if (x==0) return 6*k0*(T[1]-T[0])/pow(dx,2);
+    if (x==0) return 6*K[0]*(T[1]-T[0])/pow(dx,2);
     // fixed temperature at r=rcmb
     if (x==num_points-1) return 0.;
 
@@ -70,7 +80,13 @@ void Simulation::iterate(double time)
         T_new[i] = T[i] + dT;
     }
 
-    T = T_new; 
+    for (int i=0; i<num_points; i++)
+    {
+        T[i] = T_new[i];
+        K[i] = get_diffusivity(i); 
+    }
+
+
 }
 
 void Simulation::run(void)
