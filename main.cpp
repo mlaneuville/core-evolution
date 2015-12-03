@@ -1,10 +1,11 @@
 #include "main.h"
+#include "conductivity.h"
 #include "revision.h"
 
 class Simulation
 {
     double *T, *T_new;
-    double *K; // not used for now, constant K
+    double *K;
 
     void initialize(void);
     void iterate(double);
@@ -23,10 +24,9 @@ public:
 
 double Simulation::get_diffusivity(int i)
 {
-    // k(T) = k0/2 @ 2500K, K0 at 4500K, linear in between
-    // (purely arbitrary, I know)
-    //return k0;
-    return 0.5*k0 + (T[i]-2500)/2000.*0.5*k0;
+    double pressure = 100e9; // TODO: of course this will need to change
+    double rhocp = 7e6; // TODO: change with real value at some point 
+    return conductivity(pressure, T[i])/rhocp/pow(R,2);
 }
 
 void Simulation::initialize(void)
@@ -61,12 +61,11 @@ double Simulation::thermal_diffusion(int x)
     // fixed temperature at r=rcmb
     if (x==num_points-1) return 0.;
 
-    // constant diffusivity
-    // return k0*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
-    
     // k = k(r,T)
-    double diffusion = K[x]*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
+    double diffusion;
+    diffusion = K[x]*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
     diffusion += (K[x+1]-K[x-1])*(T[x+1]-T[x-1])/4/pow(dx,2);
+
     return diffusion;
 }
 
@@ -122,6 +121,19 @@ void Simulation::run(string prefix)
 
 int main(int argc, char **argv)
 {
+    /*
+    FILE *f = fopen("kmap.txt", "w");
+
+    double pressure, temperature;
+    for (int x=0; x<=100; x++)
+    {
+        pressure = 130e9 + x*320e9/100;
+        for (int y=0; y<=100; y++) { temperature = 2000 + y*3000./100; fprintf(f, "%.9g %.9g %.9g\n", pressure, temperature, conductivity(pressure,temperature)); }
+        fprintf(f,"\n");
+    }
+    fclose(f);
+    */
+
     string prefix = "";
     if (argc != 1) prefix = argv[1] + string("-");
 
