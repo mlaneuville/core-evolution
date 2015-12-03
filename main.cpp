@@ -25,7 +25,7 @@ double Simulation::get_diffusivity(int i)
 {
     // k(T) = k0/2 @ 2500K, K0 at 4500K, linear in between
     // (purely arbitrary, I know)
-//    return k0;
+    //return k0;
     return 0.5*k0 + (T[i]-2500)/2000.*0.5*k0;
 }
 
@@ -110,7 +110,7 @@ void Simulation::run(string prefix)
             fname << prefix << "output-" << last_out << ".txt";
             FILE *f = fopen(fname.str().c_str(), "w");
 
-            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g\n", x*dx, time/Ma, T[x]);
+            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g\n", x*dx, time/Ma, T[x], K[x]/k0);
             fprintf(f,"\n");
             fclose(f);
 
