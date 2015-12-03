@@ -51,7 +51,13 @@ double Simulation::thermal_diffusion(int x)
     // fixed temperature at r=rcmb
     if (x==num_points-1) return 0.;
 
-    return k0*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
+    // constant diffusivity
+    // return k0*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
+    
+    // k = k(r,T)
+    double diffusion = K[x]*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
+    diffusion += (K[x+1]-K[x-1])*(T[x+1]-T[x-1])/4/pow(dx,2);
+    return diffusion;
 }
 
 void Simulation::iterate(double time)
