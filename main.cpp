@@ -17,7 +17,7 @@ class Simulation
     double thermal_diffusion(int);
 
 public:
-    void run();
+    void run(string);
     
 };
 
@@ -89,7 +89,7 @@ void Simulation::iterate(double time)
 
 }
 
-void Simulation::run(void)
+void Simulation::run(string prefix)
 {
     double time = 0;
     int last_out = 0;
@@ -107,7 +107,7 @@ void Simulation::run(void)
         if (time >= snapshot*(1+last_out))
         {
             ostringstream fname;
-            fname << "output-" << last_out << ".txt";
+            fname << prefix << "output-" << last_out << ".txt";
             FILE *f = fopen(fname.str().c_str(), "w");
 
             for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g\n", x*dx, time/Ma, T[x]);
@@ -122,6 +122,9 @@ void Simulation::run(void)
 
 int main(int argc, char **argv)
 {
+    string prefix = "";
+    if (argc != 1) prefix = argv[1] + string("-");
+
     Simulation s;
-    s.run();
+    s.run(prefix);
 }

@@ -20,4 +20,5 @@ double dt = 0.25*pow(dx,2)/k0;
 double Ma = 1e6*365*24*3600.;
 double tmax = 1000*Ma;
 
+// the denominator determines how many snapshot will be written
 double snapshot = tmax/3.;
