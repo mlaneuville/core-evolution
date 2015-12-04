@@ -13,7 +13,7 @@ using namespace std;
 double PI = 3.14159265359;
 double G = 6.67e-11;
 
-int num_points = 100;
+int num_points = 200;
 
 double R = 3480e3;
 double k0 = 1e-5/pow(R,2);

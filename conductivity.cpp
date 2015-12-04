@@ -67,7 +67,7 @@ double resistivity_temperature(double T, double f)
     double gamma = 1.52;
     
     double theta = theta0*exp(-gamma*log(f)); // debye temperature 
-    double integral = simpsons(integrand, 1e-5, theta/T, 20);
+    double integral = simpsons(integrand, 1e-5, theta/T, 100);
 
     return pow(T/theta,5)*integral;
 }

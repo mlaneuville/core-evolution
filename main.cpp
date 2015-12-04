@@ -79,13 +79,15 @@ void Simulation::iterate(double time)
         dT = dt*thermal_diffusion(i);
         T_new[i] = T[i] + dT;
     }
-
+    
+    double kmax = 0;
     for (int i=0; i<num_points; i++)
     {
         T[i] = T_new[i];
         K[i] = get_diffusivity(i); 
+        if (K[i] > kmax) kmax = K[i];
     }
-
+    dt = 0.25*pow(dx,2)/kmax;
 
 }
 
