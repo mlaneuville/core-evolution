@@ -12,16 +12,15 @@
 
 #include "conductivity.h"
 
+double T0 = 1812;
+double rho0 = 7010;
+double K0 = 130e9;
+double Kp0 = 4;
+double alpha = 1e-5/exp(-0.400485*135/130);
+double alphap = 130*log(2.)/(360-135);
 
 double murnaghan(double P, double T)
 {
-    double T0 = 1812;
-    double rho0 = 7010;
-    double K0 = 130e9;
-    double Kp0 = 4;
-    double alpha = 1e-5/exp(-0.400485*135/130);
-    double alphap = 130*log(2)/(360-135);
-
     double rho = rho0*pow(1 + Kp0*P/K0, 1./Kp0);
     double dtemp = exp(-alpha*exp(-alphap*P/K0)*(T-T0));
     return rho*dtemp; // rho(T,P)
@@ -53,6 +52,26 @@ double conductivity(double P, double T)
 
 double integrand(double z) { return pow(z,5)/(exp(z)-1)/(1-exp(-z)); }
 
+
+double simpsons( double (*f)(double x), double a, double b, int n) 
+// integral using simpsons algorithm
+{
+    double h = (b - a) / n;
+    double x;
+    double r;
+    char m = 0;
+    double s = 0.0;
+
+    for (x = a; x <= b; x+=h) 
+    {
+        r = f(x);
+        if (x == a || x == b) { s += r; } 
+        else { m = !m; s += r * (m+1) * 2.0; }
+    }
+    return s * (h/3.0);
+}
+
+
 double resistivity_temperature(double T, double f)
 // Eq 1 from Gomi et al 2013
 {
@@ -60,12 +79,7 @@ double resistivity_temperature(double T, double f)
     double gamma = 1.52;
     
     double theta = theta0*exp(-gamma*log(f)); // debye temperature 
-
-    double integral = 0; 
-    int imax = 500;
-    double dz = theta/T/imax;
-    // TODO: this integral needs to be optimized
-    for (int i=1; i<=imax; i++) integral += integrand(i*dz)*dz;
+    double integral = simpsons(integrand, 1e-5, theta/T, 20);
 
     return pow(T/theta,5)*integral;
 }
