@@ -22,9 +22,6 @@ public:
     
 };
 
-double PI = 3.14159265359;
-double G = 6.67e-11;
-
 double Simulation::get_diffusivity(int i)
 {
     double rho = 11e3; 

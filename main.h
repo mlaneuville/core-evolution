@@ -10,6 +10,9 @@
 
 using namespace std;
 
+double PI = 3.14159265359;
+double G = 6.67e-11;
+
 int num_points = 100;
 
 double R = 3480e3;

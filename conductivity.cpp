@@ -1,15 +1,3 @@
-//TODO: set the includes in the right place
-
-#include <iostream>
-#include <iomanip>
-#include <sstream>
-#include <string>
-#include <fstream>
-#include <stdlib.h>
-
-#include <cmath>
-#include <cassert>
-
 #include "conductivity.h"
 
 double T0 = 1812;

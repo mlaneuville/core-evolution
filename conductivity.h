@@ -1,4 +1,13 @@
-//TODO: put declarations in the right place
+#include <iostream>
+#include <iomanip>
+#include <sstream>
+#include <string>
+#include <fstream>
+#include <stdlib.h>
+
+#include <cmath>
+#include <cassert>
+
 using namespace std;
 
 double murnaghan(double P, double T);
