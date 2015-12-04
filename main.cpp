@@ -22,11 +22,15 @@ public:
     
 };
 
+double PI = 3.14159265359;
+double G = 6.67e-11;
+
 double Simulation::get_diffusivity(int i)
 {
-    double pressure = 100e9; // TODO: of course this will need to change
-    double rhocp = 7e6; // TODO: change with real value at some point 
-    return conductivity(pressure, T[i])/rhocp/pow(R,2);
+    double rho = 11e3; 
+    double cp = 1e3;
+    double pressure = 363.85e9 - 2*PI*pow(i*dx,2)*G*pow(rho,2)/3;
+    return conductivity(pressure, T[i])/rho/cp/pow(R,2);
 }
 
 void Simulation::initialize(void)
