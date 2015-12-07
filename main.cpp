@@ -1,6 +1,10 @@
 #include "main.h"
 #include "conductivity.h"
-#include "revision.h"
+// This file is created & removed by the makefile. It is used to keep track 
+// of the revision number used to generate a given datafile.
+#include "revision.h" 
+
+// ------------------------------------------------------------------- \\
 
 class Simulation
 {
@@ -19,10 +23,12 @@ class Simulation
 
 public:
     void run(string);
-    
 };
 
+// ------------------------------------------------------------------- \\
+
 double Simulation::get_diffusivity(int i)
+// Returns diffusivity scaled by the core radius.
 {
     double rho = 11e3; 
     double cp = 1e3;
@@ -45,10 +51,12 @@ void Simulation::initialize(void)
     }
 }
 
+// Short-hand functions to compute temperature gradients.
 double Simulation::gradient_forward(int x) {return (T[x]-T[x+1])/dx;}
 double Simulation::gradient_backward(int x) {return (T[x-1]-T[x])/dx;}
 
 double Simulation::thermal_diffusion(int x)
+// Computes the right hand side.
 {
     double radius = dx*x;
     double next_radius = dx*(x+1);
@@ -56,6 +64,7 @@ double Simulation::thermal_diffusion(int x)
 
     // no flux at r=0
     if (x==0) return 6*K[0]*(T[1]-T[0])/pow(dx,2);
+
     // fixed heat flow at r=rcmb
     if (x==num_points-1) 
     {
@@ -63,7 +72,6 @@ double Simulation::thermal_diffusion(int x)
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
     }
 
-    // k = k(r,T)
     double diffusion;
     diffusion = K[x]*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
     diffusion += (K[x+1]-K[x-1])*(T[x+1]-T[x-1])/4/pow(dx,2);
@@ -88,11 +96,14 @@ void Simulation::iterate(double time)
         K[i] = get_diffusivity(i); 
         if (K[i] > kmax) kmax = K[i];
     }
+    // making sure we use a proper timestep for the new diffusivity distribution
     dt = 0.25*pow(dx,2)/kmax;
 
 }
 
 void Simulation::run(string prefix)
+// argument "prefix" will be prepended to the datafiles names.
+// the number of snapshots to output is set in main.h
 {
     double time = 0;
     int last_out = 0;
@@ -107,6 +118,7 @@ void Simulation::run(string prefix)
         iterate(time);
         time += dt;
 
+        // is it time to output a snapshot?
         if (time >= snapshot*(1+last_out))
         {
             ostringstream fname;
@@ -125,18 +137,8 @@ void Simulation::run(string prefix)
 
 int main(int argc, char **argv)
 {
-    /*
-    FILE *f = fopen("kmap.txt", "w");
-
-    double pressure, temperature;
-    for (int x=0; x<=100; x++)
-    {
-        pressure = 130e9 + x*320e9/100;
-        for (int y=0; y<=100; y++) { temperature = 2000 + y*3000./100; fprintf(f, "%.9g %.9g %.9g\n", pressure, temperature, conductivity(pressure,temperature)); }
-        fprintf(f,"\n");
-    }
-    fclose(f);
-    */
+    // uncomment to produce kmap.txt which shows k = k(T,P)
+    //print_kmap();
 
     string prefix = "";
     if (argc != 1) prefix = argv[1] + string("-");

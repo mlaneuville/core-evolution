@@ -1,5 +1,6 @@
 #include "conductivity.h"
 
+// EOS parameters - need references
 double T0 = 1812;
 double rho0 = 7010;
 double K0 = 130e9;
@@ -8,19 +9,22 @@ double alpha = 1e-5/exp(-0.400485*135/130);
 double alphap = 130*log(2.)/(360-135);
 
 double murnaghan(double P, double T)
+// Uses Murnaghan EOS to provide rho(P,T)
 {
     double rho = rho0*pow(1 + Kp0*P/K0, 1./Kp0);
     double dtemp = exp(-alpha*exp(-alphap*P/K0)*(T-T0));
-    return rho*dtemp; // rho(T,P)
+    return rho*dtemp;
 }
 
 double volume_ratio(double P, double T)
+// V/V0 = rho0/rho
+// note: STP conditions should be computed only once
 {
-    // V/V0 = rho0/rho
     return murnaghan(0,300)/murnaghan(P,T);
 }
 
 double conductivity(double P, double T)
+// From Gomi et al. (2013); Eq 11-13
 {
     double concentration_Si = 22.5;
     double f = volume_ratio(P,T);
@@ -94,3 +98,19 @@ double resistivity_volume(double f, string element)
 
     return F1*pow(F2-f, F3);
 }
+
+void print_kmap(void)
+// Produces a data file with k = k(T,P) - mostly for debugging purposes
+{
+    FILE *f = fopen("kmap.txt", "w");
+
+    double pressure, temperature;
+    for (int x=0; x<=100; x++)
+    {
+        pressure = 130e9 + x*320e9/100;
+        for (int y=0; y<=100; y++) { temperature = 2000 + y*3000./100; fprintf(f, "%.9g %.9g %.9g\n", pressure, temperature, conductivity(pressure,temperature)); }
+        fprintf(f,"\n");
+    }
+    fclose(f);
+}
+
