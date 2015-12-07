@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Time-stamp: "2015-12-07 16:04:50 marine"
+# Time-stamp: "2015-12-07 16:34:59 marine"
 
 # First argument : number of plots needed (1 if blank)
 # Second argument : filenames are output-#.txt by default.
@@ -12,9 +12,10 @@ import numpy as np
 basename = "output-"
 end = ".txt"
 
-if len(sys.argv)>2:
-    print sys.argv
+
+if len(sys.argv)>1:
     N = int(sys.argv[1])
+    print N, "files."
     if len(sys.argv)==3:
         basename = sys.argv[2]+"-"+basename
 else: N = 0
@@ -24,7 +25,7 @@ fig, (ax1, ax2) = plt.subplots(2, sharex=True)
 for nombre in range(N+1):
 
 
-    print nombre
+    print "...", nombre
     rayon, temperature, conductivity = [], [], []
 
 
