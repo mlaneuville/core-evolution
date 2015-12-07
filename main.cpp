@@ -43,9 +43,6 @@ void Simulation::initialize(void)
         T[i] = T_new[i];
         K[i] = get_diffusivity(i);
     }
-    // the CMB is kept at 2500 K
-    T_new[num_points-1] = 2500;
-    T[num_points-1] = 2500;
 }
 
 double Simulation::gradient_forward(int x) {return (T[x]-T[x+1])/dx;}
@@ -59,8 +56,12 @@ double Simulation::thermal_diffusion(int x)
 
     // no flux at r=0
     if (x==0) return 6*K[0]*(T[1]-T[0])/pow(dx,2);
-    // fixed temperature at r=rcmb
-    if (x==num_points-1) return 0.;
+    // fixed heat flow at r=rcmb
+    if (x==num_points-1) 
+    {
+        double heat = 1e13/(4*PI*pow(R,3)*11e6*K[x]);
+        return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
+    }
 
     // k = k(r,T)
     double diffusion;
