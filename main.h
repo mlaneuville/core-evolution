@@ -26,4 +26,4 @@ double dx = 1./num_points;
 double dt = 0.25*pow(dx,2)/k0;
 
 // the denominator determines how many snapshots will be written
-double snapshot = tmax/3.;
+double snapshot = tmax/10.;
