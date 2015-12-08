@@ -29,11 +29,12 @@ public:
 
 double Simulation::get_diffusivity(int i)
 // Returns diffusivity scaled by the core radius.
+// TODO: diffusivity takes into account variable density, but the estimation
+// of pressure from the radius does not so far.
 {
     double rho = 11e3; 
-    double cp = 1e3;
     double pressure = 363.85e9 - 2*PI*pow(i*dx,2)*G*pow(rho,2)/3;
-    return conductivity(pressure, T[i])/rho/cp/pow(R,2);
+    return diffusivity(pressure, T[i])/pow(R,2);
 }
 
 void Simulation::initialize(void)

@@ -7,6 +7,7 @@ double K0 = 130e9;
 double Kp0 = 4;
 double alpha = 1e-5/exp(-0.400485*135/130);
 double alphap = 130*log(2.)/(360-135);
+double cp = 750; // Gubbins et al 2003
 
 double murnaghan(double P, double T)
 // Uses Murnaghan EOS to provide rho(P,T)
@@ -21,6 +22,12 @@ double volume_ratio(double P, double T)
 // note: STP conditions should be computed only once
 {
     return murnaghan(0,300)/murnaghan(P,T);
+}
+
+double diffusivity(double P, double T)
+// Returns diffusivity using rho(P,T) and constant cp
+{
+    return conductivity(P,T)/murnaghan(P,T)/cp;
 }
 
 double conductivity(double P, double T)
