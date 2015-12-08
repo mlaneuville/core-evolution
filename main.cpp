@@ -18,6 +18,9 @@ class Simulation
 
     double gradient_forward(int);
     double gradient_backward(int);
+    double gradient_adiabat(int); 
+
+    int is_convective(int);
 
     double thermal_diffusion(int);
 
@@ -26,6 +29,13 @@ public:
 };
 
 // ------------------------------------------------------------------- \\
+
+int Simulation::is_convective(int i)
+// check if the local gradient is super-adiabatic and returns state
+{
+    if (0.5*(gradient_forward(i)+gradient_backward(i)) > gradient_adiabat(i)) { return 1; }
+    else { return 0; }
+}
 
 double Simulation::get_diffusivity(int i)
 // Returns diffusivity scaled by the core radius.
@@ -56,12 +66,27 @@ void Simulation::initialize(void)
 double Simulation::gradient_forward(int x) {return (T[x]-T[x+1])/dx;}
 double Simulation::gradient_backward(int x) {return (T[x-1]-T[x])/dx;}
 
+double Simulation::gradient_adiabat(int x) 
+// Computes local adiabatic gradient
+{
+    // memo: alpha is defined in conductivity.h 
+    double gravity = 10*x/num_points; 
+    double grad = alpha*gravity*T[x]/cp;
+    return grad/R; // has to be normalized by R_core
+}
+
 double Simulation::thermal_diffusion(int x)
 // Computes the right hand side.
 {
     double radius = dx*x;
     double next_radius = dx*(x+1);
-    double prev_radius = dx*(x-1);
+    double prev_radius = dx*(x-1);  
+
+    if (is_convective(x))
+    { 
+        // effective diffusivity here
+    }
+    
 
     // no flux at r=0
     if (x==0) return 6*K[0]*(T[1]-T[0])/pow(dx,2);
@@ -89,6 +114,8 @@ void Simulation::iterate(double time)
         dT = dt*thermal_diffusion(i);
         T_new[i] = T[i] + dT;
     }
+
+    double dTa = gradient_adiabat(num_points-10);
     
     double kmax = 0;
     for (int i=0; i<num_points; i++)
@@ -126,7 +153,7 @@ void Simulation::run(string prefix)
             fname << prefix << "output-" << last_out << ".txt";
             FILE *f = fopen(fname.str().c_str(), "w");
 
-            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g\n", x*dx, time/Ma, T[x], K[x]/k0);
+            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x]/k0, is_convective(x));
             fprintf(f,"\n");
             fclose(f);
 

@@ -1,14 +1,5 @@
 #include "conductivity.h"
 
-// EOS parameters - need references
-double T0 = 1812;
-double rho0 = 7010;
-double K0 = 130e9;
-double Kp0 = 4;
-double alpha = 1e-5/exp(-0.400485*135/130);
-double alphap = 130*log(2.)/(360-135);
-double cp = 750; // Gubbins et al 2003
-
 double murnaghan(double P, double T)
 // Uses Murnaghan EOS to provide rho(P,T)
 {
