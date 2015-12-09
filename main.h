@@ -10,6 +10,7 @@
 
 using namespace std;
 
+const double rho = 11e3; 
 
 double PI = 3.14159265359;
 double G = 6.67e-11;

@@ -27,7 +27,7 @@ class Simulation
 public:
     void run(string);
 };
-
+   
 // ------------------------------------------------------------------- \\
 
 int Simulation::is_convective(int i)
@@ -42,7 +42,6 @@ double Simulation::get_diffusivity(int i)
 // TODO: diffusivity takes into account variable density, but the estimation
 // of pressure from the radius does not so far.
 {
-    double rho = 11e3; 
     double pressure = 363.85e9 - 2*PI*pow(i*dx,2)*G*pow(rho,2)/3;
     return diffusivity(pressure, T[i])/pow(R,2);
 }
@@ -70,7 +69,7 @@ double Simulation::gradient_adiabat(int x)
 // Computes local adiabatic gradient
 {
     // memo: alpha is defined in conductivity.h 
-    double gravity = 10*x/num_points; 
+    double gravity = 4*PI*G*rho*R*x/num_points/3; // see Eq. 6 of Labrosse 2015 for higher order
     double grad = alpha*gravity*T[x]/cp;
     return grad/R; // has to be normalized by R_core
 }
