@@ -33,15 +33,18 @@ conductivity = np.reshape(conductivity, (num_tstep, grid_size))
 convect= data[:,4]
 convect = np.reshape(convect, (num_tstep, grid_size))
 
+# check where the "convect" field first changes from 0 to 1
+# TODO: this does not catch multiple boundaries!
 convective_boundary = np.where(np.diff(convect) == 1)[1]*1./grid_size
 
 # FIG1. time, radius temperature map
 fig, ax = plt.subplots(figsize=(8,6))
-heatmap = ax.pcolor(radius, time, temperature, cmap=plt.cm.jet)
+heatmap = ax.imshow(temperature, 
+                    extent=[radius[0,0], radius[0,-1], int(time[0,0]), int(time[-1,0])], 
+                    aspect='auto', origin='lower')
 cbar = fig.colorbar(heatmap)
 plt.plot(convective_boundary, time[:,0], 'k', lw=2)
 plt.ylim(time[0,0], time[-1,0])
-plt.xlim(radius[0,0], radius[0,-1])
 plt.xlabel("Radius [-]")
 plt.ylabel("Time [Ma]")
 plt.savefig(fig_folder+"2D-temperature-map.eps", format='eps', bbox_inches='tight')
