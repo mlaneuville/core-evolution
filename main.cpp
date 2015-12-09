@@ -139,6 +139,11 @@ void Simulation::run(string prefix)
     cout << "Initializes simulation using revision " << revision << "..." << endl;
     initialize();
 
+    ostringstream fname;
+    fname << prefix << "output-" << last_out << ".txt";
+    FILE *f = fopen(fname.str().c_str(), "w"); // make sure we don't append to an old file
+    fclose(f);
+
     cout << "Iterates..." << endl;
     while (time < tmax)
     {
@@ -148,9 +153,7 @@ void Simulation::run(string prefix)
         // is it time to output a snapshot?
         if (time >= snapshot*(1+last_out))
         {
-            ostringstream fname;
-            fname << prefix << "output-" << last_out << ".txt";
-            FILE *f = fopen(fname.str().c_str(), "w");
+            FILE *f = fopen(fname.str().c_str(), "a");
 
             for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x]/k0, is_convective(x));
             fprintf(f,"\n");

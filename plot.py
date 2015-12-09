@@ -1,53 +1,77 @@
-#!/usr/bin/env python
-# Time-stamp: "2015-12-08 14:07:42 marine"
-
-# First argument : number of plots needed (1 if blank)
-# Second argument : filenames are output-#.txt by default.
-# If 'optional_run_name->output-XXX.txt' is used, add the optional_run_name as second argument.
-
-import sys
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
-basename = "output-"
-end = ".txt"
-
+fig_folder = "fig/"
+basename = "output-0.txt"
 
 if len(sys.argv)>1:
     N = int(sys.argv[1])
-    print N, "files."
+    print N, "profiles to display."
     if len(sys.argv)==3:
         basename = sys.argv[2]+"-"+basename
-else: N = 0
+else: N = 2
 
+
+# prepare data
+# TODO: grid_size should be read from file in future version
+data = np.genfromtxt(basename)
+grid_size = 200
+num_tstep = data.shape[0]/grid_size
+print "(grid_size, num_tstep) = (%d,%d)" % (grid_size, num_tstep)
+print
+
+# read data from file
+radius = data[:,0]
+radius = np.reshape(radius, (num_tstep, grid_size))
+time = data[:,1]
+time = np.reshape(time, (num_tstep, grid_size))
+temperature = data[:,2]
+temperature = np.reshape(temperature, (num_tstep, grid_size))
+conductivity = data[:,3]
+conductivity = np.reshape(conductivity, (num_tstep, grid_size))
+convect= data[:,4]
+convect = np.reshape(convect, (num_tstep, grid_size))
+
+convective_boundary = np.where(np.diff(convect) == 1)[1]*1./grid_size
+
+# FIG1. time, radius temperature map
+fig, ax = plt.subplots(figsize=(8,6))
+heatmap = ax.pcolor(radius, time, temperature, cmap=plt.cm.jet)
+cbar = fig.colorbar(heatmap)
+plt.plot(convective_boundary, time[:,0], 'k', lw=2)
+plt.ylim(time[0,0], time[-1,0])
+plt.xlim(radius[0,0], radius[0,-1])
+plt.xlabel("Radius [-]")
+plt.ylabel("Time [Ma]")
+plt.savefig(fig_folder+"2D-temperature-map.eps", format='eps', bbox_inches='tight')
+plt.close()
+
+# FIG2. selection of temperature and conductivity profiles
 fig, (ax1, ax2) = plt.subplots(2, sharex=True)
     
-for number in range(N+1):
+for number in range(N):
 
+    idx = int(number*num_tstep*1./(N-1))
+    idx = min(idx, num_tstep-1)
+    print "...", idx
 
-    print "...", number
-    radius, temperature, conductivity = [], [], []
+    rad, temp, cond = [], [], []
 
+    rad = radius[idx, :]
+    temp = temperature[idx, :]
+    cond = conductivity[idx, :]
 
-    with open(basename+str(number)+end,'r') as f:
-        for i, l in enumerate(f):
-            if len(l) > 4:
-                L = l.split(" ")
-                radius = np.append(radius, float(L[0]))
-                temperature = np.append(temperature, float(L[2]))
-                conductivity = np.append(conductivity, float(L[3]))
-                if i==1:
-                    Time = float(L[1])
-
-
-    LABEL = "Time: "+"{:.0f}".format(Time)+" Ma"
-    ax1.plot(radius, temperature, label=LABEL)
-    ax2.plot(radius, conductivity, label=LABEL)
+    LABEL = "Time: "+"{:.0f}".format(time[idx,0])+" Ma"
+    ax1.plot(rad, temp, label=LABEL)
+    ax2.plot(rad, cond, label=LABEL)
 
 ax1.set_ylabel('Temperature')
 ax2.set_ylabel('Conductivity')
 ax2.set_xlabel('Radius')
-fig.subplots_adjust(hspace=0)
+ax1.grid()
+ax2.grid()
 plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
 ax1.legend(loc=0)
-plt.show()
+plt.savefig(fig_folder+"1D-profiles.eps", format='eps', bbox_inches='tight')
+plt.close()

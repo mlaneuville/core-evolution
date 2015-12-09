@@ -1,4 +1,5 @@
 syntax: glob
 
+fig/*
 *.txt
 a.out

@@ -26,5 +26,5 @@ double k0 = 1e-5/pow(R,2); // thermal diffusivity scaled with core radius
 double dx = 1./num_points;
 double dt = 0.25*pow(dx,2)/k0;
 
-// the denominator determines how many snapshots will be written
-double snapshot = tmax/10.;
+// what is the duration between snapshots?
+double snapshot = 10*Ma;
