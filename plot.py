@@ -1,8 +1,15 @@
+#!/usr/local/bin/python
+# Time-stamp: <2016-01-28 17:17:08 marine>
+# Project : Thermal evolution of stratified core
+# Subproject : plot output.
+# Author : Matthieu Laneuville, Marine Lasbleis
+
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
-fig_folder = "fig/"
+
+# fig_folder = "fig/"
 basename = "output-0.txt"
 
 if len(sys.argv)>1:
