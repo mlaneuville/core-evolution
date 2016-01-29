@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-01-29 13:41:31 marine>
+# Time-stamp: <2016-01-29 14:41:01 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : Read (and correct/interpolate/etc.) data sets given by G.H. 
 # Author : Marine Lasbleis
@@ -11,12 +11,13 @@ import sys
 
 
 
-def homogeneous_sample_data(basename="earth", Npoints=200):
+def homogeneous_sample_data(basename="earth", folder="./dat/", Npoints=200):
 
 
-    filename = basename+".dat"
-    output_file = basename+"_resampled.txt"
-
+    filename = folder+basename+".dat"
+    output_file1 = folder+"polynomes_"+basename+".dat"
+    output_file2 = folder+"resampled_"+basename+".dat"
+    
     fig, ax = plt.subplots(3, 2, sharex=True)
     
     fig.suptitle("Data and fit", fontsize=14)
@@ -31,6 +32,7 @@ def homogeneous_sample_data(basename="earth", Npoints=200):
     
     data = np.genfromtxt(filename)
     print "====="
+    print "data file: ", filename
     print "Number of points, number of columns : ", np.shape(data)
     print "Data is R (km) T (K) g (m/s**2) P (Pa)"
     print "====="
@@ -53,23 +55,39 @@ def homogeneous_sample_data(basename="earth", Npoints=200):
     # functions Temperature and Pressure are fitted with polynomes
     # Constraints are : value at 0 (T[0] and P[0]) and tangent at 0 (=0)
     # Gravity is approximated by g=g0 r (linear in radius)
-    A0 = Temperature[0]
-    B0 = Pressure[0]
+    T0 = Temperature[0]
+    P0 = Pressure[0]
     A1 = 0. #tangent at x=0
 
     
-    ax[0,1].plot(Radius[1:]/1e3, (Temperature[1:] -(A0))/Radius[1:]**2., 'r+')
-    ax[1,1].plot(Radius[1:]/1e3, (Pressure[1:] -(B0))/Radius[1:]**2., 'r+')
+    ax[0,1].plot(Radius[1:]/1e3, (Temperature[1:] -(T0))/Radius[1:]**2., 'r+')
+    ax[1,1].plot(Radius[1:]/1e3, (Pressure[1:] -(P0))/Radius[1:]**2., 'r+')
     ax[2,1].plot(Radius[1:]/1e3, Gravity[1:]/Radius[1:], 'r+')
 
-    polyn_temp = np.polyfit(Radius[1:], (Temperature[1:] -(A0))/Radius[1:]**2., 4)
-    polyn_press = np.polyfit(Radius[1:], (Pressure[1:] -(B0))/Radius[1:]**2., 4)
+    
+    polyn_temp = np.polyfit(Radius[1:], (Temperature[1:] -(T0))/Radius[1:]**2., 4)
+    polyn_press = np.polyfit(Radius[1:], (Pressure[1:] -(P0))/Radius[1:]**2., 4)
+    polynomes_temp = np.append(np.array([T0, 0]), polyn_temp)
+    polynomes_press = np.append(np.array([P0, 0]), polyn_press)
+
     polyn_grav = np.polyfit(Radius[1:], Gravity[1:]/Radius[1:], 0)
+    polynomes_gravity = np.append(np.array([0]), polyn_grav)
+    
+    maxlength = len(polynomes_temp)
+    polynomes_all = np.zeros((maxlength, 3))
+    polynomes_all[0:len(polynomes_temp),0] = polynomes_temp
+    polynomes_all[0:len(polynomes_press),1] = polynomes_press
+    polynomes_all[0:len(polynomes_gravity),2] = polynomes_gravity
+    text = "Polynomial coefficients pour Temperature (K), Pressure (Pa), Gravity (m/s**2) as function of radius (m). Highest power first."
+    np.savetxt(output_file1, polynomes_all, header=text)
+    print "Output file with polynomial coefficients: ", output_file1
+    print "Number of coefficients: ", maxlength
+    print "==="
 
     #new radius repartition (resampling with constant dr)
     r = np.linspace(Radius[0], Radius[-1], Npoints)
-    temp = np.polyval(polyn_temp, r)*r**2+A0
-    press = np.polyval(polyn_press, r)*r**2+B0
+    temp = np.polyval(polyn_temp, r)*r**2+T0
+    press = np.polyval(polyn_press, r)*r**2+P0
     grav = np.polyval(polyn_grav, r)*r
     
     ax[0,0].plot(r/1e3, temp)
@@ -83,12 +101,13 @@ def homogeneous_sample_data(basename="earth", Npoints=200):
     
 
     data_resample = np.concatenate((np.array([r]).T, np.array([temp]).T, np.array([press]).T, np.array([grav]).T), axis=1)
-    np.savetxt(output_file, data_resample, header="radius (m), temperature (K)")
+    np.savetxt(output_file2, data_resample, header="radius (m), temperature (K)")
+    print "Output file with resample data: ", output_file2
+    print "Number of points in radius: ", Npoints
+    print "==="
 
-    polynomes_temp = numpy.array([A0, 0])
-    polynomes_temp.append(polyn_temp)
-    print polyn_temp, polynomes_temp
 
+    print "Figures:" 
     print "red '+': data points, blue line: fit and resample"
     plt.show()
     
@@ -102,13 +121,15 @@ if __name__ == '__main__':
     # name of the data file (default: earth.dat)
     if len(sys.argv)>1:
         name = sys.argv[1]
-        print "data file: ", name
     else: name = "earth"
+    name = name
+
 
     # number of points in the new profile
     if len(sys.argv)==3:
         Npoints = int(sys.argv[2])
     else: Npoints = 200
 
-
-    homogeneous_sample_data(name, Npoints)
+    folder = "./dat/"
+        
+    homogeneous_sample_data(name, folder, Npoints)
