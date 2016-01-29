@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-01-29 12:09:28 marine>
+# Time-stamp: <2016-01-29 13:41:31 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : Read (and correct/interpolate/etc.) data sets given by G.H. 
 # Author : Marine Lasbleis
@@ -84,6 +84,10 @@ def homogeneous_sample_data(basename="earth", Npoints=200):
 
     data_resample = np.concatenate((np.array([r]).T, np.array([temp]).T, np.array([press]).T, np.array([grav]).T), axis=1)
     np.savetxt(output_file, data_resample, header="radius (m), temperature (K)")
+
+    polynomes_temp = numpy.array([A0, 0])
+    polynomes_temp.append(polyn_temp)
+    print polyn_temp, polynomes_temp
 
     print "red '+': data points, blue line: fit and resample"
     plt.show()
