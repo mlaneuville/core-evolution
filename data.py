@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-01-29 14:41:01 marine>
+# Time-stamp: <2016-01-29 14:47:50 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : Read (and correct/interpolate/etc.) data sets given by G.H. 
 # Author : Marine Lasbleis
@@ -11,8 +11,18 @@ import sys
 
 
 
-def homogeneous_sample_data(basename="earth", folder="./dat/", Npoints=200):
+def homogeneous_sample_data(basename="earth", folder="./dat/", Npoints=20):
+    """ Open file folder/basename.dat and transform the data to be used by main.cpp
 
+    parameters:
+    - basename, folder: data file (folder/basename.dat will be used. Default is ./dat/earth.dat)
+    data file has 4 columns: R (km) T (K) g (m/s**2) P (Pa). 
+    - Npoints: number of points for the resampling. Default is 20.
+    return: nothing.
+    print 2 files: (output is SI, so radius in m and pressure in Pa!)
+    - polynomes_basename: polynomial coefficients
+    - resampled_basename: similar data set than the input ones, but resampled with constant steps in radius. 
+    """
 
     filename = folder+basename+".dat"
     output_file1 = folder+"polynomes_"+basename+".dat"
