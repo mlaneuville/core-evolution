@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-01-29 22:22:53 marine>
+# Time-stamp: <2016-01-29 22:39:08 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : Read (and correct/interpolate/etc.) data sets given by G.H. 
 # Author : Marine Lasbleis
@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+
+### `python data.py` will run over the 4 planets (Earth, Venus, Mars, Vesta)
+### `python data.py planet` will run over the planet `planet` only
 
 
 def homogeneous_sample_data(basename="earth", folder="./dat/", Npoints=20):
@@ -153,20 +156,14 @@ def homogeneous_sample_data(basename="earth", folder="./dat/", Npoints=20):
 
 
 if __name__ == '__main__':
-
-
+    
     # name of the data file (default: earth.dat)
     if len(sys.argv)>1:
-        name = sys.argv[1]
-    else: name = "earth"
-    name = name
+        Names = [sys.argv[1]]
+    else: Names = ['earth', 'mars', 'vesta', 'venus']
 
-
-    # number of points in the new profile
-    if len(sys.argv)==3:
-        Npoints = int(sys.argv[2])
-    else: Npoints = 200
-
+    Npoints = 200
     folder = "./dat/"
         
-    homogeneous_sample_data(name, folder, Npoints)
+    for name in Names:
+        homogeneous_sample_data(name, folder, Npoints)
