@@ -128,7 +128,7 @@ double Simulation::gradient_adiabat(int x)
 // Computes local adiabatic gradient
 {
     double grad = alpha*gravity[x]*T[x]/cp;
-    return grad/R; // has to be normalized by R_core
+    return grad*R; // has to be normalized by R_core
 }
 
 double Simulation::thermal_diffusion(int x)
@@ -145,7 +145,7 @@ double Simulation::thermal_diffusion(int x)
     rw = r - 0.5*dx;
     re = r + 0.5*dx;
 
-    // what happens at boundaries?
+    // this is not used at x=0 or x=num_points-1 (see below)
     kw = 2*K[x-1]*K[x]/(K[x-1]+K[x]);
     ke = 2*K[x+1]*K[x]/(K[x+1]+K[x]);
 
@@ -158,27 +158,32 @@ double Simulation::thermal_diffusion(int x)
     fw = 0;
     fe = 0;
  
-    if (is_convective(x) && x<num_points-1)
+    if (is_convective(x))
     { 
         // effective diffusivity from Kimura et al. 2009
-        double Tw, Te;
-        Tw = 0.5*(T[x-1]+T[x]);
-        Te = 0.5*(T[x]+T[x+1]);
+        double Taw, Tae;
+        Taw = 0.5*(gradient_adiabat(x)+gradient_adiabat(x-1));
+        Tae = 0.5*(gradient_adiabat(x+1)+gradient_adiabat(x));
 
-        // what is this value?
+        // TODO: what is this value for earth's core?
         double mu = 1e16/rho;
 
-        double dT_backward = max(0., gw - alpha*gravity[x]*Tw/cp);
-        double dT_forward = max(0., gw - alpha*gravity[x]*Tw/cp);
+        double dT_backward = max(0., gw - Taw)/R;
+        double dT_forward = max(0., ge - Tae)/R;
         double dist = (num_points-x)*dx*R;
 
-        double kc_backward = min(1e-17, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_backward/pow(R,2));
-        double kc_forward = min(1e-17, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_forward/pow(R,2));
+        double kc_backward = min(1e-5, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_backward)/pow(R,2);
+        double kc_forward = min(1e-5, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_forward)/pow(R,2);
 
-        fw = kc_backward*dT_backward;
-        fe = kc_forward*dT_forward;
+        fw = kc_backward*dT_backward*R; // all non-dimensional
+        fe = kc_forward*dT_forward*R;
 
-        //cout << fw/qw << "\t" << fe/qe << endl;
+//        cout << dist << "\t" << kc_backward << "\t" << kc_forward << endl;
+//        cout << fw/qw << "\t" << fe/qe << endl;
+
+       fw = 0.;
+       fe = 0.;
+
     }
 
     // no flux at r=0
@@ -187,7 +192,7 @@ double Simulation::thermal_diffusion(int x)
     // fixed heat flow at r=rcmb
     if (x==num_points-1) 
     {
-        double heat = 1e13/(4*PI*pow(R,3)*11e6*K[x]);
+        double heat = 1e14/(4*PI*pow(R,3)*11e6*K[x]);
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
     }
 
@@ -204,8 +209,6 @@ void Simulation::iterate(double time)
         T_new[i] = T[i] + dT;
     }
 
-    double dTa = gradient_adiabat(num_points-10);
-    
     double kmax = 0;
     for (int i=0; i<num_points; i++)
     {
