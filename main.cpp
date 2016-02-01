@@ -158,9 +158,27 @@ double Simulation::thermal_diffusion(int x)
     fw = 0;
     fe = 0;
  
-    if (is_convective(x))
+    if (is_convective(x) && x<num_points-1)
     { 
-        // effective diffusivity here
+        // effective diffusivity from Kimura et al. 2009
+        double Tw, Te;
+        Tw = 0.5*(T[x-1]+T[x]);
+        Te = 0.5*(T[x]+T[x+1]);
+
+        // what is this value?
+        double mu = 1e16/rho;
+
+        double dT_backward = max(0., gw - alpha*gravity[x]*Tw/cp);
+        double dT_forward = max(0., gw - alpha*gravity[x]*Tw/cp);
+        double dist = (num_points-x)*dx*R;
+
+        double kc_backward = min(1e-17, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_backward/pow(R,2));
+        double kc_forward = min(1e-17, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_forward/pow(R,2));
+
+        fw = kc_backward*dT_backward;
+        fe = kc_forward*dT_forward;
+
+        //cout << fw/qw << "\t" << fe/qe << endl;
     }
 
     // no flux at r=0
