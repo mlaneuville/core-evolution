@@ -68,7 +68,7 @@ void Simulation::read_profiles(string s)
             }
         }
     } else {
-        cout << "Error reading data file!" << endl;
+        cout << "Error reading data file! Please use {earth, mars, venus or vesta} as argument." << endl;
         exit(0);
     }
 }
@@ -85,12 +85,13 @@ double Simulation::get_diffusivity(int i)
 // TODO: diffusivity takes into account variable density, but the estimation
 // of pressure from the radius does not so far.
 {
-    double pressure = 363.85e9 - 2*PI*pow(i*dx,2)*G*pow(rho,2)/3;
-    return diffusivity(pressure, T[i])/pow(R,2);
+    return diffusivity(pressure[i], T[i])/pow(R,2);
 }
 
 void Simulation::initialize(void)
 {
+    gravity = (double*)malloc(num_points*sizeof(double));
+    pressure = (double*)malloc(num_points*sizeof(double));
     T = (double*)malloc(num_points*sizeof(double));
     T_new = (double*)malloc(num_points*sizeof(double));
     K = (double*)malloc(num_points*sizeof(double));
@@ -100,7 +101,14 @@ void Simulation::initialize(void)
         // initialize with a linear gradient from 2000 to 4500 K
         double rad = i*dx*R;
         T_new[i] = 0.;
-        for(int j=0; j<polynom_order; j++) T_new[i] += cT[j]*pow(rad, polynom_order-j-1);
+        gravity[i] = 0.;
+        pressure[i] = 0.;
+        for(int j=0; j<polynom_order; j++) 
+        {
+            T_new[i] += cT[j]*pow(rad, polynom_order-j-1);
+            gravity[i] += cg[j]*pow(rad, polynom_order-j-1);
+            pressure[i] += cP[j]*pow(rad, polynom_order-j-1);
+        }
         T[i] = T_new[i];
         K[i] = get_diffusivity(i);
     }
@@ -114,8 +122,7 @@ double Simulation::gradient_adiabat(int x)
 // Computes local adiabatic gradient
 {
     // memo: alpha is defined in conductivity.h 
-    double gravity = 4*PI*G*rho*R*x/num_points/3; // see Eq. 6 of Labrosse 2015 for higher order
-    double grad = alpha*gravity*T[x]/cp;
+    double grad = alpha*gravity[x]*T[x]/cp;
     return grad/R; // has to be normalized by R_core
 }
 
