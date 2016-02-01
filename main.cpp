@@ -134,15 +134,34 @@ double Simulation::gradient_adiabat(int x)
 double Simulation::thermal_diffusion(int x)
 // Computes the right hand side.
 {
-    double radius = dx*x;
-    double next_radius = dx*(x+1);
-    double prev_radius = dx*(x-1);  
+    double r;
+    double rw, re; // west, east radii
+    double kw, ke; // west, east thermal diffusivity
+    double qw, qe; // west, east prefactor
+    double fw, fe; // west, east effective diffusivity
+    double gw, ge; // west, east temperature gradient
 
+    r = x*dx;
+    rw = r - 0.5*dx;
+    re = r + 0.5*dx;
+
+    // what happens at boundaries?
+    kw = 2*K[x-1]*K[x]/(K[x-1]+K[x]);
+    ke = 2*K[x+1]*K[x]/(K[x+1]+K[x]);
+
+    gw = gradient_backward(x);
+    ge = gradient_forward(x);
+
+    qw = kw*gw;
+    qe = ke*ge;
+
+    fw = 0;
+    fe = 0;
+ 
     if (is_convective(x))
     { 
         // effective diffusivity here
     }
-    
 
     // no flux at r=0
     if (x==0) return 6*K[0]*(T[1]-T[0])/pow(dx,2);
@@ -154,11 +173,7 @@ double Simulation::thermal_diffusion(int x)
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
     }
 
-    double diffusion;
-    diffusion = K[x]*((x+1)*T[x+1]-2*x*T[x]+(x-1)*T[x-1])/pow(dx,2)/x;
-    diffusion += (K[x+1]-K[x-1])*(T[x+1]-T[x-1])/4/pow(dx,2);
-
-    return diffusion;
+    return ((qw+fw)*pow(rw,2) - (qe+fe)*pow(re,2))/dx/pow(r,2);
 }
 
 void Simulation::iterate(double time)
