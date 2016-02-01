@@ -9,7 +9,7 @@ import numpy as np
 import sys
 
 
-# fig_folder = "fig/"
+fig_folder = "fig/"
 basename = "output-0.txt"
 
 if len(sys.argv)>1:
@@ -54,7 +54,7 @@ plt.plot(convective_boundary, time[:,0], 'k', lw=2)
 plt.ylim(time[0,0], time[-1,0])
 plt.xlabel("Radius [-]")
 plt.ylabel("Time [Ma]")
-plt.savefig("2D-temperature-map.eps", format='eps', bbox_inches='tight')
+plt.savefig(fig_folder+"2D-temperature-map.eps", format='eps', bbox_inches='tight')
 plt.close()
 
 # FIG2. selection of temperature and conductivity profiles
@@ -83,5 +83,5 @@ ax1.grid()
 ax2.grid()
 plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
 ax1.legend(loc=0)
-plt.savefig("1D-profiles.eps", format='eps', bbox_inches='tight')
+plt.savefig(fig_folder+"1D-profiles.eps", format='eps', bbox_inches='tight')
 plt.close()
