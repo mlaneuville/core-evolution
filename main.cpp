@@ -36,19 +36,25 @@ public:
 // ------------------------------------------------------------------- \\
 
 void Simulation::read_profiles(string s)
+// read polynome coefficients from dat/polynomes_prefix.dat
+// this assumes that the coefficients are listed with higher
+// order first.
 {
     cout << "Reading profiles from " << s << "..." << endl;
     string line;
     polynom_order = -1; // header line should not be counted
     ifstream data_file (s.c_str());
+
     if (data_file.is_open())
     {
+        // count lines to get highest order
         while (getline(data_file, line)) { polynom_order++; }
         cT = (double*)malloc(polynom_order*sizeof(double));
         cP = (double*)malloc(polynom_order*sizeof(double));
         cg = (double*)malloc(polynom_order*sizeof(double));
         cout << " ... polynom order = " << polynom_order << endl;
 
+        // the file pointer has to be set back to origin before reading the data
         data_file.clear();
         data_file.seekg(0);
 
@@ -59,7 +65,8 @@ void Simulation::read_profiles(string s)
             istringstream iss(line);
             string sub1, sub2, sub3;
             iss >> sub1 >> sub2 >> sub3;
-            if (sub1 != "#") // python commented line
+
+            if (sub1 != "#") // we don't want python commented line
             {
                 cT[i] = stof(sub1);
                 cP[i] = stof(sub2);
@@ -82,7 +89,6 @@ int Simulation::is_convective(int i)
 
 double Simulation::get_diffusivity(int i)
 // Returns diffusivity scaled by the core radius.
-// TODO: diffusivity takes into account variable density, but the estimation
 // of pressure from the radius does not so far.
 {
     return diffusivity(pressure[i], T[i])/pow(R,2);
