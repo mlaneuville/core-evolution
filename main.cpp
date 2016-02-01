@@ -89,7 +89,6 @@ int Simulation::is_convective(int i)
 
 double Simulation::get_diffusivity(int i)
 // Returns diffusivity scaled by the core radius.
-// of pressure from the radius does not so far.
 {
     return diffusivity(pressure[i], T[i])/pow(R,2);
 }
@@ -104,11 +103,12 @@ void Simulation::initialize(void)
 
     for (int i=0; i<num_points; i++)
     {
-        // initialize with a linear gradient from 2000 to 4500 K
         double rad = i*dx*R;
         T_new[i] = 0.;
         gravity[i] = 0.;
         pressure[i] = 0.;
+        // use the polynomial coefficients to initialize the different profiles
+        // gravity and pressure won't change with time.
         for(int j=0; j<polynom_order; j++) 
         {
             T_new[i] += cT[j]*pow(rad, polynom_order-j-1);
@@ -127,7 +127,6 @@ double Simulation::gradient_backward(int x) {return (T[x-1]-T[x])/dx;}
 double Simulation::gradient_adiabat(int x) 
 // Computes local adiabatic gradient
 {
-    // memo: alpha is defined in conductivity.h 
     double grad = alpha*gravity[x]*T[x]/cp;
     return grad/R; // has to be normalized by R_core
 }
