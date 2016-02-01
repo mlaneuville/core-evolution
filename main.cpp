@@ -9,7 +9,7 @@
 class Simulation
 {
     int polynom_order;
-    double *cT, *cP, *cG; // polynomial coefficients for temperature, pressure, gravity
+    double *cT, *cP, *cg; // polynomial coefficients for temperature, pressure, gravity
     double *gravity, *pressure; // profiles; won't change with time
 
     double *T, *T_new;
@@ -39,17 +39,32 @@ void Simulation::read_profiles(string s)
 {
     cout << "Reading profiles from " << s << "..." << endl;
     string line;
+    polynom_order = -1; // header line should not be counted
     ifstream data_file (s.c_str());
     if (data_file.is_open())
     {
+        while (getline(data_file, line)) { polynom_order++; }
+        cT = (double*)malloc(polynom_order*sizeof(double));
+        cP = (double*)malloc(polynom_order*sizeof(double));
+        cg = (double*)malloc(polynom_order*sizeof(double));
+        cout << " ... polynom order = " << polynom_order << endl;
+
+        data_file.clear();
+        data_file.seekg(0);
+
+        int i=0;
         while (getline(data_file, line))
         {
-            std::istringstream iss(line);
+            // not very elegant but i don't know how to split a line better
+            istringstream iss(line);
             string sub1, sub2, sub3;
             iss >> sub1 >> sub2 >> sub3;
-            if (sub1 != "#") 
+            if (sub1 != "#") // python commented line
             {
-                cout << stof(sub1) << "\t" << stof(sub2) << "\t" << stof(sub3) << endl;
+                cT[i] = stof(sub1);
+                cP[i] = stof(sub2);
+                cg[i] = stof(sub3);
+                i++;
             }
         }
     } else {
@@ -83,7 +98,9 @@ void Simulation::initialize(void)
     for (int i=0; i<num_points; i++)
     {
         // initialize with a linear gradient from 2000 to 4500 K
-        T_new[i] = 2000 + i*2500./num_points;
+        double rad = i*dx*R;
+        T_new[i] = 0.;
+        for(int j=0; j<polynom_order; j++) T_new[i] += cT[j]*pow(rad, polynom_order-j-1);
         T[i] = T_new[i];
         K[i] = get_diffusivity(i);
     }
@@ -165,14 +182,15 @@ void Simulation::run(string prefix)
 
     cout << "Initializes simulation using revision " << revision << "..." << endl;
 
-    ostringstream fname;
-    fname << "dat/polynomes_" << prefix << ".dat";
-    read_profiles(fname.str());
+    ostringstream fname1;
+    fname1 << "dat/polynomes_" << prefix << ".dat";
+    read_profiles(fname1.str());
 
     initialize();
 
-    fname << prefix << "-output-" << last_out << ".txt";
-    FILE *f = fopen(fname.str().c_str(), "w"); // make sure we don't append to an old file
+    ostringstream fname2;
+    fname2 << prefix << "-output-" << last_out << ".txt";
+    FILE *f = fopen(fname2.str().c_str(), "w"); // make sure we don't append to an old file
     fclose(f);
 
     cout << "Iterates..." << endl;
@@ -184,7 +202,8 @@ void Simulation::run(string prefix)
         // is it time to output a snapshot?
         if (time >= snapshot*(1+last_out))
         {
-            FILE *f = fopen(fname.str().c_str(), "a");
+            cout << " ... snapshot at t = " << time/Ma << " Ma" << endl;
+            FILE *f = fopen(fname2.str().c_str(), "a");
 
             for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x]/k0, is_convective(x));
             fprintf(f,"\n");
