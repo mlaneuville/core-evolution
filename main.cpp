@@ -8,9 +8,14 @@
 
 class Simulation
 {
+    int polynom_order;
+    double *cT, *cP, *cG; // polynomial coefficients for temperature, pressure, gravity
+    double *gravity, *pressure; // profiles; won't change with time
+
     double *T, *T_new;
     double *K;
 
+    void read_profiles(string);
     void initialize(void);
     void iterate(double);
 
@@ -29,6 +34,29 @@ public:
 };
    
 // ------------------------------------------------------------------- \\
+
+void Simulation::read_profiles(string s)
+{
+    cout << "Reading profiles from " << s << "..." << endl;
+    string line;
+    ifstream data_file (s.c_str());
+    if (data_file.is_open())
+    {
+        while (getline(data_file, line))
+        {
+            std::istringstream iss(line);
+            string sub1, sub2, sub3;
+            iss >> sub1 >> sub2 >> sub3;
+            if (sub1 != "#") 
+            {
+                cout << stof(sub1) << "\t" << stof(sub2) << "\t" << stof(sub3) << endl;
+            }
+        }
+    } else {
+        cout << "Error reading data file!" << endl;
+        exit(0);
+    }
+}
 
 int Simulation::is_convective(int i)
 // check if the local gradient is super-adiabatic and returns state
@@ -134,13 +162,16 @@ void Simulation::run(string prefix)
 {
     double time = 0;
     int last_out = 0;
-    string prepend = "output-";
 
     cout << "Initializes simulation using revision " << revision << "..." << endl;
-    initialize();
 
     ostringstream fname;
-    fname << prefix << "output-" << last_out << ".txt";
+    fname << "dat/polynomes_" << prefix << ".dat";
+    read_profiles(fname.str());
+
+    initialize();
+
+    fname << prefix << "-output-" << last_out << ".txt";
     FILE *f = fopen(fname.str().c_str(), "w"); // make sure we don't append to an old file
     fclose(f);
 
@@ -171,7 +202,7 @@ int main(int argc, char **argv)
     //print_kmap();
 
     string prefix = "";
-    if (argc != 1) prefix = argv[1] + string("-");
+    if (argc != 1) prefix = argv[1];
 
     Simulation s;
     s.run(prefix);
