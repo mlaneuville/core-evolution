@@ -172,27 +172,21 @@ double Simulation::thermal_diffusion(int x)
         double dT_forward = max(0., ge - Tae)/R;
         double dist = (num_points-x)*dx*R;
 
-        double kc_backward = min(1e-5, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_backward)/pow(R,2);
-        double kc_forward = min(1e-5, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_forward)/pow(R,2);
+        double kc_backward = min(1e-3, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_backward)/pow(R,2);
+        double kc_forward = min(1e-3, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_forward)/pow(R,2);
 
         fw = kc_backward*dT_backward*R; // all non-dimensional
         fe = kc_forward*dT_forward*R;
-
-//        cout << dist << "\t" << kc_backward << "\t" << kc_forward << endl;
-//        cout << fw/qw << "\t" << fe/qe << endl;
-
-       fw = 0.;
-       fe = 0.;
-
     }
 
     // no flux at r=0
     if (x==0) return 6*K[0]*(T[1]-T[0])/pow(dx,2);
 
-    // fixed heat flow at r=rcmb
+    // heat flow at r=rcmb; relatively arbitrary for now, but depends on temperature
     if (x==num_points-1) 
     {
-        double heat = 1e14/(4*PI*pow(R,3)*11e6*K[x]);
+        double heat = 10.*(T[x]-2000)/100e3*4*PI*pow(R,2);
+        heat /= (4*PI*pow(R,3)*11e6*K[x]);
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
     }
 
@@ -217,7 +211,9 @@ void Simulation::iterate(double time)
         if (K[i] > kmax) kmax = K[i];
     }
     // making sure we use a proper timestep for the new diffusivity distribution
-    dt = 0.25*pow(dx,2)/kmax;
+    // TODO: sensitivity analysis on dt; results should converge
+    // TODO: find a way to dynamically update dt (taking into account convection)
+    dt = 0.01*pow(dx,2)/kmax;
 
 }
 
