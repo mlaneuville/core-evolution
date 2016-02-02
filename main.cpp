@@ -249,7 +249,7 @@ void Simulation::run(string prefix)
             cout << " ... snapshot at t = " << time/Ma << " Ma" << endl;
             FILE *f = fopen(fname2.str().c_str(), "a");
 
-            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x]/k0, is_convective(x));
+            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x]/k0, gradient_adiabat(x)/R, is_convective(x));
             fprintf(f,"\n");
             fclose(f);
 

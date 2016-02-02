@@ -37,7 +37,9 @@ temperature = data[:,2]
 temperature = np.reshape(temperature, (num_tstep, grid_size))
 conductivity = data[:,3]
 conductivity = np.reshape(conductivity, (num_tstep, grid_size))
-convect= data[:,4]
+adiabat = data[:,4]
+adiabat = np.reshape(adiabat, (num_tstep, grid_size))
+convect = data[:,5]
 convect = np.reshape(convect, (num_tstep, grid_size))
 
 # check where the "convect" field first changes from 0 to 1
@@ -58,7 +60,7 @@ plt.savefig(fig_folder+"2D-temperature-map.eps", format='eps', bbox_inches='tigh
 plt.close()
 
 # FIG2. selection of temperature and conductivity profiles
-fig, (ax1, ax2) = plt.subplots(2, sharex=True)
+fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
     
 for number in range(N):
 
@@ -66,22 +68,39 @@ for number in range(N):
     idx = min(idx, num_tstep-1)
     print "...", idx
 
-    rad, temp, cond = [], [], []
+    rad, temp, cond, ad = [], [], [], []
 
     rad = radius[idx, :]
     temp = temperature[idx, :]
     cond = conductivity[idx, :]
+    ad = adiabat[idx, :]*1000
+    dtemp = np.append(np.array([0]), np.diff(temp))/(3480e3/grid_size)*1000
 
     LABEL = "Time: "+"{:.0f}".format(time[idx,0])+" Ma"
+
     ax1.plot(rad, temp, label=LABEL)
     ax2.plot(rad, cond, label=LABEL)
 
-ax1.set_ylabel('Temperature')
-ax2.set_ylabel('Conductivity')
-ax2.set_xlabel('Radius')
+    ax3.plot(rad, -ad, label=LABEL)
+    ax4.plot(rad, dtemp, label=LABEL)
+
+ax1.set_ylabel('Temperature [K]')
+ax2.set_ylabel('Conductivity [-]')
+ax3.set_ylabel('Adiabatic gradient [K/km]')
+ax4.set_ylabel('Temperature gradient [K/km]')
+
+ax1.set_xlabel('Radius [-]')
+ax2.set_xlabel('Radius [-]')
+ax3.set_xlabel('Radius [-]')
+ax4.set_xlabel('Radius [-]')
+
 ax1.grid()
 ax2.grid()
+ax3.grid()
+ax4.grid()
+
+#ax1.legend(loc=0)
+plt.tight_layout()
 plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
-ax1.legend(loc=0)
 plt.savefig(fig_folder+"1D-profiles.eps", format='eps', bbox_inches='tight')
 plt.close()
