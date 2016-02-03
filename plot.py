@@ -11,12 +11,14 @@ import sys
 
 fig_folder = "fig/"
 basename = "output-0.txt"
+suffix = ""
 
 if len(sys.argv)>1:
     N = int(sys.argv[1])
     print N, "profiles to display."
     if len(sys.argv)==3:
         basename = sys.argv[2]+"-"+basename
+        suffix = "-"+sys.argv[2]
 else: N = 2
 
 
@@ -56,7 +58,7 @@ plt.plot(convective_boundary, time[:,0], 'k', lw=2)
 plt.ylim(time[0,0], time[-1,0])
 plt.xlabel("Radius [-]")
 plt.ylabel("Time [Ma]")
-plt.savefig(fig_folder+"2D-temperature-map.eps", format='eps', bbox_inches='tight')
+plt.savefig(fig_folder+"2D-temperature-map"+suffix+".eps", format='eps', bbox_inches='tight')
 plt.close()
 
 # FIG2. selection of temperature and conductivity profiles
@@ -102,5 +104,5 @@ ax4.grid()
 #ax1.legend(loc=0)
 plt.tight_layout()
 plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
-plt.savefig(fig_folder+"1D-profiles.eps", format='eps', bbox_inches='tight')
+plt.savefig(fig_folder+"1D-profiles"+suffix+".eps", format='eps', bbox_inches='tight')
 plt.close()
