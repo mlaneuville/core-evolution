@@ -10,6 +10,8 @@
 
 using namespace std;
 
+string body = "earth";
+
 double tbl_conductivity = 5; // W/m/K
 double mu = 1e5; // kinematic viscosity 
 double T_mantle = 4500;

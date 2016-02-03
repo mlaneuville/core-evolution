@@ -17,6 +17,7 @@ class Simulation
     double *T, *T_new;
     double *K;
 
+    void write_params_to_file(FILE*);
     void read_profiles(string);
     void initialize(void);
     void iterate(double);
@@ -220,10 +221,25 @@ void Simulation::iterate(double time)
         if (K[i] > kmax) kmax = K[i];
     }
     // making sure we use a proper timestep for the new diffusivity distribution
-    // TODO: sensitivity analysis on dt; results should converge
-    // TODO: find a way to dynamically update dt (taking into account convection)
     dt = 0.01*pow(dx,2)/kmax;
 
+}
+
+void Simulation::write_params_to_file(FILE *f)
+{
+    fprintf(f, "# code revision: %s\n", revision.c_str());
+    fprintf(f, "# target body: %s\n", body.c_str());
+    fprintf(f, "# num_points: %d\n", num_points);
+
+    fprintf(f, "# core radius: %.e\n", R);
+    fprintf(f, "# TBL thickness: %.e\n", TBL);
+
+    fprintf(f, "# TBL conductivity: %.f\n", tbl_conductivity);
+    fprintf(f, "# Kinematic visc: %.e\n", mu);
+    fprintf(f, "# Mantle temperature: %.f\n", T_mantle);
+
+    fprintf(f, "#\n");
+    return;
 }
 
 void Simulation::run(string name, string body)
@@ -244,6 +260,7 @@ void Simulation::run(string name, string body)
     ostringstream fname2;
     fname2 << "out/" << name << "-output.txt";
     FILE *f = fopen(fname2.str().c_str(), "w"); // make sure we don't append to an old file
+    write_params_to_file(f);
     fclose(f);
 
     cout << "Iterates..." << endl;
@@ -272,7 +289,7 @@ int main(int argc, char **argv)
 {
     YAML::Node config = YAML::LoadFile("config.yaml");
     string run_name = config["run_name"].as<string>();
-    string body = config["body"].as<string>();
+    body = config["body"].as<string>();
 
     num_points = config["num_points"].as<int>();
     dx = 1./num_points;
