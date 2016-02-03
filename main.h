@@ -12,21 +12,18 @@ using namespace std;
 
 double mu = 1e5; // kinematic viscosity 
 double T_mantle = 4500;
-double TBL = 100e3; // thermal boundary layer thickness
 
 double PI = 3.14159265359;
 double G = 6.67e-11;
 double Ma = 1e6*365*24*3600.;
 
-double tmax = 1000*Ma; // duration of the run - will move to command line argument at some point
-
 int num_points = 200; // grid size
+double dx = 1./num_points;
+
+double tmax = 1000*Ma; // duration of the run - will move to command line argument at some point
+double snapshot = 10*Ma;
+double dt = 0.01*pow(dx,2)/1e-5; // will be updated as soon as actual diffusivity is computed
 
 double R = 3480e3; // core size [m]
-double k0 = 1e-5/pow(R,2); // thermal diffusivity scaled with core radius
+double TBL = 100e3; // thermal boundary layer thickness
 
-double dx = 1./num_points;
-double dt = 0.25*pow(dx,2)/k0;
-
-// what is the duration between snapshots?
-double snapshot = 10*Ma;

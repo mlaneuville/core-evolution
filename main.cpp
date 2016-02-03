@@ -32,7 +32,7 @@ class Simulation
     double thermal_diffusion(int);
 
 public:
-    void run(string);
+    void run(string, string);
 };
    
 // ------------------------------------------------------------------- \\
@@ -120,7 +120,7 @@ void Simulation::initialize(void)
         T[i] = T_new[i];
         K[i] = get_diffusivity(i);
     }
-    kmax = k0;
+    kmax = get_diffusivity(num_points-1);
 }
 
 // Short-hand functions to compute temperature gradients.
@@ -220,7 +220,7 @@ void Simulation::iterate(double time)
 
 }
 
-void Simulation::run(string prefix)
+void Simulation::run(string name, string body)
 // argument "prefix" will be prepended to the datafiles names.
 // the number of snapshots to output is set in main.h
 {
@@ -230,13 +230,13 @@ void Simulation::run(string prefix)
     cout << "Initializes simulation using revision " << revision << "..." << endl;
 
     ostringstream fname1;
-    fname1 << "dat/polynomes_" << prefix << ".dat";
+    fname1 << "dat/polynomes_" << body << ".dat";
     read_profiles(fname1.str());
 
     initialize();
 
     ostringstream fname2;
-    fname2 << prefix << "-output-" << last_out << ".txt";
+    fname2 << "out/" << name << "-output.txt";
     FILE *f = fopen(fname2.str().c_str(), "w"); // make sure we don't append to an old file
     fclose(f);
 
@@ -252,7 +252,7 @@ void Simulation::run(string prefix)
             cout << " ... snapshot at t = " << time/Ma << " Ma" << endl;
             FILE *f = fopen(fname2.str().c_str(), "a");
 
-            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x]/k0, gradient_adiabat(x)/R, is_convective(x));
+            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x], gradient_adiabat(x)/R, is_convective(x));
             fprintf(f,"\n");
             fclose(f);
 
@@ -265,7 +265,8 @@ void Simulation::run(string prefix)
 int main(int argc, char **argv)
 {
     YAML::Node config = YAML::LoadFile("config.yaml");
-    cout << config["run_name"] << endl;
+    string run_name = config["run_name"].as<string>();
+    string body = config["body"].as<string>();
 
     num_points = config["num_points"].as<int>();
     dx = 1./num_points;
@@ -279,12 +280,7 @@ int main(int argc, char **argv)
     mu = config["kinematic_visc"].as<double>();
     T_mantle = config["mantle_temperature"].as<double>();
 
-    // uncomment to produce kmap.txt which shows k = k(T,P)
-    //print_kmap();
-
-    string prefix = "";
-    prefix = config["body"].as<string>();
 
     Simulation s;
-    s.run(prefix);
+    s.run(run_name, body);
 }
