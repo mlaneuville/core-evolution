@@ -22,6 +22,7 @@ class Simulation
     void iterate(double);
 
     double get_diffusivity(int);
+    double calculate_heat_flow(void);
 
     double gradient_forward(int);
     double gradient_backward(int);
@@ -134,6 +135,13 @@ double Simulation::gradient_adiabat(int x)
     return grad*R; // has to be normalized by R_core
 }
 
+double Simulation::calculate_heat_flow(void)
+// calculate CMB heat flow from core temperature, mantle temperature
+// and thermal boundary layer thickness.
+{
+    return tbl_conductivity*(T[num_points-1]-T_mantle)/TBL*4*PI*pow(R,2);
+}
+
 double Simulation::thermal_diffusion(int x)
 // Computes the right hand side.
 {
@@ -187,9 +195,7 @@ double Simulation::thermal_diffusion(int x)
     // heat flow at r=rcmb; relatively arbitrary for now, but depends on temperature
     if (x==num_points-1) 
     {
-        // TODO: implement consistent CMB heat flow
-        double heat = 10.*(T[x]-T_mantle)/TBL*4*PI*pow(R,2);
-        heat /= (4*PI*pow(R,3)*11e6*K[x]);
+        double heat = calculate_heat_flow()/(4*PI*pow(R,3)*11e6*K[x]);
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
     }
 
@@ -252,7 +258,7 @@ void Simulation::run(string name, string body)
             cout << " ... snapshot at t = " << time/Ma << " Ma" << endl;
             FILE *f = fopen(fname2.str().c_str(), "a");
 
-            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x], gradient_adiabat(x)/R, is_convective(x));
+            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], K[x], gradient_adiabat(x)/R, calculate_heat_flow()/1e12, is_convective(x));
             fprintf(f,"\n");
             fclose(f);
 
@@ -277,6 +283,7 @@ int main(int argc, char **argv)
     snapshot = config["snapshot"].as<int>()*Ma;
     tmax = config["tmax"].as<double>()*Ma;
 
+    tbl_conductivity = config["tbl_conductivity"].as<double>();
     mu = config["kinematic_visc"].as<double>();
     T_mantle = config["mantle_temperature"].as<double>();
 
