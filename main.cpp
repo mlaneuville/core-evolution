@@ -189,6 +189,7 @@ double Simulation::thermal_diffusion(int x)
     // heat flow at r=rcmb; relatively arbitrary for now, but depends on temperature
     if (x==num_points-1) 
     {
+        // TODO: implement consistent CMB heat flow
         double heat = 10.*(T[x]-2000)/100e3*4*PI*pow(R,2);
         heat /= (4*PI*pow(R,3)*11e6*K[x]);
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
