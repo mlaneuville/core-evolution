@@ -12,6 +12,7 @@ class Simulation
     double *cT, *cP, *cg; // polynomial coefficients for temperature, pressure, gravity
     double *gravity, *pressure; // profiles; won't change with time
 
+    double kmax; // tracks largest diffusivity to control dt
     double *T, *T_new;
     double *K;
 
@@ -118,6 +119,7 @@ void Simulation::initialize(void)
         T[i] = T_new[i];
         K[i] = get_diffusivity(i);
     }
+    kmax = k0;
 }
 
 // Short-hand functions to compute temperature gradients.
@@ -174,6 +176,8 @@ double Simulation::thermal_diffusion(int x)
 
         double kc_backward = min(1e-3, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_backward)/pow(R,2);
         double kc_forward = min(1e-3, alpha*gravity[x]*pow(dist,4)/(18*mu)*dT_forward)/pow(R,2);
+        double temp = max(kc_backward, kc_forward);
+        if (temp > kmax) kmax = temp;
 
         fw = kc_backward*dT_backward*R; // all non-dimensional
         fe = kc_forward*dT_forward*R;
