@@ -1,3 +1,4 @@
+#include "yaml-cpp/yaml.h"
 #include "main.h"
 #include "conductivity.h"
 // This file is created & removed by the makefile. It is used to keep track 
@@ -266,6 +267,16 @@ void Simulation::run(string prefix)
 
 int main(int argc, char **argv)
 {
+    YAML::Node config = YAML::LoadFile("config.yaml");
+    cout << config["run_name"] << endl;
+
+    num_points = config["num_points"].as<int>();
+    dx = 1./num_points;
+
+    tmax = config["tmax"].as<double>()*Ma;
+    R = config["core_radius"].as<int>()*1e3;
+    snapshot = config["snapshot"].as<int>()*Ma;
+
     // uncomment to produce kmap.txt which shows k = k(T,P)
     //print_kmap();
 
