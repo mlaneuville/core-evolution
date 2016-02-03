@@ -2,26 +2,26 @@ Solves the diffusion equation in a sphere with variable diffusivity.
 
 ### How-to
 
+The library `yaml-cpp` is required to use the configuration file. The library and instructions to install it can be found at https://github.com/jbeder/yaml-cpp
+
 * Run `make` to prepare the executable file.
-* Then `./a.out <optional_run_name>` will run the simulation.
-* The output will be `<optional_run_name->output-XXX.txt`, where XXX is output number.
-* Each file contains a temperature and diffusivity profile at a given time.
-
-The number of outputs can be set in `main.h`
-
-A way to visualize a temperature profile in gnuplot for instance is `plot "output-0.txt" u 1:3 w l`.
+* Update the configuration file `config.yaml` if necessary.
+* Then `./a.out` will run the simulation.
+* The output will be `<run_name>-output.txt`, and located in the `out` folder.
+* Code revision and relevant parameters are prepended to that file for future reference.
 
 
-### plot.py
+Examples of direct gnuplot visualizations are:
 
-to run it: `python plot.py N name`
-* N is the number of plot you want (by default, it would be only the
-first file output-0.txt which will be used)
-* name is the `<optional_run_name>` (without the dash) if used to
-obtain the .txt files.
+* `plot "output.txt" u 1:3 w l`
+* `plot "output.txt" u 1:2:3 w image`
 
-so for
-`./a.out test`
-with 3 outputs (the default parameters in main.h)
-you should use
-`python plot.py 3 test`
+
+### Visualisation using plot.py
+
+To run it: `python plot.py name N`, where:
+
+* N is the number of profiles you want (evenly split between t0 and tmax)
+* name is the `<run_name>` from which to read the data
+
+The figures are saved in the folder `fig`.
