@@ -6,6 +6,7 @@ body: earth                 # decide which initial profiles to use
 core_radius: 3480           # in km // could actually be read from file
 kinematic_visc: 1e5         # fudge parameter?
 mantle_temperature: 4500    # in K, kept constant
+tbl_thickness: 100          # in km, thermal boundary layer thickness
 
 # Simulation properties
 num_points: 200             # size of the grid

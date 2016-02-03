@@ -168,9 +168,6 @@ double Simulation::thermal_diffusion(int x)
         Taw = 0.5*(gradient_adiabat(x)+gradient_adiabat(x-1));
         Tae = 0.5*(gradient_adiabat(x+1)+gradient_adiabat(x));
 
-        // TODO: what is this value for earth's core?
-        double mu = 1e16/rho;
-
         double dT_backward = max(0., gw - Taw)/R;
         double dT_forward = max(0., ge - Tae)/R;
         double dist = (num_points-x)*dx*R;
@@ -191,7 +188,7 @@ double Simulation::thermal_diffusion(int x)
     if (x==num_points-1) 
     {
         // TODO: implement consistent CMB heat flow
-        double heat = 10.*(T[x]-2000)/100e3*4*PI*pow(R,2);
+        double heat = 10.*(T[x]-T_mantle)/TBL*4*PI*pow(R,2);
         heat /= (4*PI*pow(R,3)*11e6*K[x]);
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
     }
@@ -273,15 +270,20 @@ int main(int argc, char **argv)
     num_points = config["num_points"].as<int>();
     dx = 1./num_points;
 
-    tmax = config["tmax"].as<double>()*Ma;
     R = config["core_radius"].as<int>()*1e3;
+    TBL = config["tbl_thickness"].as<double>()*1e3;
+
     snapshot = config["snapshot"].as<int>()*Ma;
+    tmax = config["tmax"].as<double>()*Ma;
+
+    mu = config["kinematic_visc"].as<double>();
+    T_mantle = config["mantle_temperature"].as<double>();
 
     // uncomment to produce kmap.txt which shows k = k(T,P)
     //print_kmap();
 
     string prefix = "";
-    if (argc != 1) prefix = argv[1];
+    prefix = config["body"].as<string>();
 
     Simulation s;
     s.run(prefix);

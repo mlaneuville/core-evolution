@@ -10,7 +10,9 @@
 
 using namespace std;
 
-const double rho = 11e3; 
+double mu = 1e5; // kinematic viscosity 
+double T_mantle = 4500;
+double TBL = 100e3; // thermal boundary layer thickness
 
 double PI = 3.14159265359;
 double G = 6.67e-11;
