@@ -11,6 +11,7 @@
 using namespace std;
 
 string body = "earth";
+bool full_convecting = true;
 
 double tbl_conductivity = 5; // W/m/K
 double mu = 1e5; // kinematic viscosity 

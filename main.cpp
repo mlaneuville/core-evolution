@@ -188,6 +188,9 @@ double Simulation::thermal_diffusion(int x)
 
         fw = kc_backward*dT_backward*R; // all non-dimensional
         fe = kc_forward*dT_forward*R;
+    } else {
+        // if at least a point is not convective, we are not "full_convecting"
+        if (x != 0) full_convecting = false;
     }
 
     // no flux at r=0
@@ -281,6 +284,13 @@ void Simulation::run(string name, string body)
 
             last_out++;
         }
+
+        if (full_convecting)
+        {
+            cout << "Full convecting!" << endl;
+            exit(0);
+        }
+        full_convecting = true; // starts true, then checks if at least one point is not
     }
     cout << "Done!..." << endl;
 }
