@@ -244,7 +244,7 @@ void Simulation::write_params_to_file(FILE *f)
 
     fprintf(f, "# Constant diffusivity: %d\n", int(constant_diff));
     if (constant_diff)
-        fprintf(f, "# Diffusivity value: %.e\n", constant_diff_value);
+        fprintf(f, "# Diffusivity value: %.3e\n", constant_diff_value);
 
     fprintf(f, "#\n");
     return;
