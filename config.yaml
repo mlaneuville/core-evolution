@@ -9,6 +9,9 @@ mantle_temperature: 4500    # in K, kept constant
 tbl_thickness: 100          # in km, thermal boundary layer thickness
 tbl_conductivity: 5         # in W/m/K
 
+constant_diff: false         #
+constant_diff_value: 2e-5   # im m2/s, if constant_diff=false, this won't be used
+
 # Simulation properties
 num_points: 200             # size of the grid
 tmax: 1000                  # in Ma

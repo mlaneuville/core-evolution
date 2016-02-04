@@ -94,7 +94,8 @@ int Simulation::is_convective(int i)
 double Simulation::get_diffusivity(int i)
 // Returns diffusivity scaled by the core radius.
 {
-    return diffusivity(pressure[i], T[i])/pow(R,2);
+    if (constant_diff) return constant_diff_value/pow(R,2);
+    else return diffusivity(pressure[i], T[i])/pow(R,2);
 }
 
 void Simulation::initialize(void)
@@ -241,6 +242,10 @@ void Simulation::write_params_to_file(FILE *f)
     fprintf(f, "# Kinematic visc: %.e\n", mu);
     fprintf(f, "# Mantle temperature: %.f\n", T_mantle);
 
+    fprintf(f, "# Constant diffusivity: %d\n", int(constant_diff));
+    if (constant_diff)
+        fprintf(f, "# Diffusivity value: %.e\n", constant_diff_value);
+
     fprintf(f, "#\n");
     return;
 }
@@ -314,6 +319,8 @@ int main(int argc, char **argv)
     mu = config["kinematic_visc"].as<double>();
     T_mantle = config["mantle_temperature"].as<double>();
 
+    constant_diff = config["constant_diff"].as<bool>();
+    constant_diff_value = config["constant_diff_value"].as<double>();
 
     Simulation s;
     s.run(run_name, body);
