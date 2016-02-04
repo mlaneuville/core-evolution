@@ -235,11 +235,11 @@ void Simulation::write_params_to_file(FILE *f)
     fprintf(f, "# target body: %s\n", body.c_str());
     fprintf(f, "# num_points: %d\n", num_points);
 
-    fprintf(f, "# core radius: %.e\n", R);
-    fprintf(f, "# TBL thickness: %.e\n", TBL);
+    fprintf(f, "# core radius: %.3e\n", R);
+    fprintf(f, "# TBL thickness: %.3e\n", TBL);
 
     fprintf(f, "# TBL conductivity: %.f\n", tbl_conductivity);
-    fprintf(f, "# Kinematic visc: %.e\n", mu);
+    fprintf(f, "# Kinematic visc: %.3e\n", mu);
     fprintf(f, "# Mantle temperature: %.f\n", T_mantle);
 
     fprintf(f, "# Constant diffusivity: %d\n", int(constant_diff));
