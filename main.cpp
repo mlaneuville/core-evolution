@@ -303,6 +303,12 @@ void Simulation::run()
     
 void Simulation::load_config(string fname)
 {
+    if (!ifstream(fname))
+    {
+        cout << "Config file not found. Please copy default.yaml to config.yaml to start." << endl;
+        exit(0);
+    }
+
     YAML::Node config = YAML::LoadFile(fname);
     run_name = config["run_name"].as<string>();
     body = config["body"].as<string>();
