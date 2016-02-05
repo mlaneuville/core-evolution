@@ -11,6 +11,10 @@ The library `yaml-cpp` is required to use the configuration file. The library an
 * Code revision and relevant parameters are prepended to that file for future reference.
 
 
+To install yaml-cpp, OS X user can also use Homebrew:
+
+* brew install yaml-cpp
+
 Examples of direct gnuplot visualizations are:
 
 * `plot "output.txt" u 1:3 w l`
