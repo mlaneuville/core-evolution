@@ -10,6 +10,7 @@
 
 using namespace std;
 
+string run_name = "testrun";
 string body = "earth";
 bool full_convecting = true;
 

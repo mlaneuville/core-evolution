@@ -34,7 +34,8 @@ class Simulation
     double thermal_diffusion(int);
 
 public:
-    void run(string, string);
+    void load_config(string);
+    void run();
 };
    
 // ------------------------------------------------------------------- \\
@@ -250,7 +251,7 @@ void Simulation::write_params_to_file(FILE *f)
     return;
 }
 
-void Simulation::run(string name, string body)
+void Simulation::run()
 // argument "prefix" will be prepended to the datafiles names.
 // the number of snapshots to output is set in main.h
 {
@@ -266,7 +267,7 @@ void Simulation::run(string name, string body)
     initialize();
 
     ostringstream fname2;
-    fname2 << "out/" << name << "-output.txt";
+    fname2 << "out/" << run_name << "-output.txt";
     FILE *f = fopen(fname2.str().c_str(), "w"); // make sure we don't append to an old file
     write_params_to_file(f);
     fclose(f);
@@ -299,11 +300,11 @@ void Simulation::run(string name, string body)
     }
     cout << "Done!..." << endl;
 }
-
-int main(int argc, char **argv)
+    
+void Simulation::load_config(string fname)
 {
-    YAML::Node config = YAML::LoadFile("config.yaml");
-    string run_name = config["run_name"].as<string>();
+    YAML::Node config = YAML::LoadFile(fname);
+    run_name = config["run_name"].as<string>();
     body = config["body"].as<string>();
 
     num_points = config["num_points"].as<int>();
@@ -321,7 +322,11 @@ int main(int argc, char **argv)
 
     constant_diff = config["constant_diff"].as<bool>();
     constant_diff_value = config["constant_diff_value"].as<double>();
+}
 
+int main(int argc, char **argv)
+{
     Simulation s;
-    s.run(run_name, body);
+    s.load_config("config.yaml");
+    s.run();
 }
