@@ -201,6 +201,7 @@ double Simulation::thermal_diffusion(int x)
     // heat flow at r=rcmb; relatively arbitrary for now, but depends on temperature
     if (x==num_points-1) 
     {
+        // TODO: generalize for different bodies
         double heat = calculate_heat_flow()/(4*PI*pow(R,3)*11e6*K[x]);
         return (2*x*T[x-1]-2*x*T[x]-(1+x)*2*dx*heat)*K[x]/x/pow(dx,2);
     }
@@ -211,6 +212,14 @@ double Simulation::thermal_diffusion(int x)
 void Simulation::iterate(double time)
 {
     double dT;
+
+    // making sure we use a proper timestep for the new diffusivity distribution
+    dt = 0.01*pow(dx,2)/kmax;
+    // the heat flow from the top shell to the core should not be more than 10x
+    // typical conducting heat flow
+    double dt_boundary = 10*5e3*cp*1e-2*shell_volume/calculate_heat_flow();
+
+    if (dt_boundary < dt) dt = dt_boundary;
 
     for (int i=0; i<num_points; i++)
     {
@@ -225,8 +234,6 @@ void Simulation::iterate(double time)
         K[i] = get_diffusivity(i); 
         if (K[i] > kmax) kmax = K[i];
     }
-    // making sure we use a proper timestep for the new diffusivity distribution
-    dt = 0.01*pow(dx,2)/kmax;
 }
 
 void Simulation::write_params_to_file(FILE *f)

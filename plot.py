@@ -79,7 +79,7 @@ for number in range(N):
     cond = conductivity[idx, :]
     ad = adiabat[idx, :]*1000
     # TODO: generalize this
-    dtemp = np.append(np.array([0]), np.diff(temp))/(rad[-1]/grid_size)*1000
+    dtemp = np.append(np.array([0]), np.diff(temp))/(rad[-1]/grid_size)
 
     LABEL = "Time: "+"{:.0f}".format(time[idx,0])+" Ma"
 
