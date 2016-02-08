@@ -92,7 +92,7 @@ ax5.plot(time[:,0], qcmb[:,0])
 ax5.set_xlim(time[0,0], time[-1,0])
 
 ax1.set_ylabel('Temperature [K]')
-ax2.set_ylabel('Conductivity [1e-5 W/m/K]')
+ax2.set_ylabel('Diffusivity [1e-5 m$^2$/s]')
 ax3.set_ylabel('Adiabatic gradient [K/km]')
 ax4.set_ylabel('Temperature gradient [K/km]')
 ax5.set_ylabel('CMB heat flow [TW]')
