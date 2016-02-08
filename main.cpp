@@ -227,7 +227,6 @@ void Simulation::iterate(double time)
     }
     // making sure we use a proper timestep for the new diffusivity distribution
     dt = 0.01*pow(dx,2)/kmax;
-
 }
 
 void Simulation::write_params_to_file(FILE *f)
@@ -284,7 +283,7 @@ void Simulation::run()
             cout << " ... snapshot at t = " << time/Ma << " Ma" << endl;
             FILE *f = fopen(fname2.str().c_str(), "a");
 
-            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %.9g %.9g %d\n", x*dx, time/Ma, T[x], pow(R,2)*K[x], gradient_adiabat(x)/R, calculate_heat_flow()/1e12, is_convective(x));
+            for (int x=0;x<num_points;x++) fprintf(f, "%.9g %.9g %.9g %.9g %.9g %.9g %d\n", R*x*dx/1e3, time/Ma, T[x], pow(R,2)*K[x], gradient_adiabat(x)/R, calculate_heat_flow()/1e12, is_convective(x));
             fprintf(f,"\n");
             fclose(f);
 

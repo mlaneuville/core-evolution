@@ -47,23 +47,24 @@ convect = np.reshape(convect, (num_tstep, grid_size))
 
 # check where the "convect" field first changes from 0 to 1
 # TODO: this does not catch multiple boundaries!
-convective_boundary = np.where(np.diff(convect) == 1)[1]*1./grid_size
+convective_boundary = np.where(np.diff(convect) == 1)[1]*1.*radius[0,-1]/grid_size
 
 # FIG1. time, radius temperature map
-fig, ax = plt.subplots(figsize=(8,6))
+fig, ax = plt.subplots(figsize=(12,8))
 heatmap = ax.imshow(temperature, 
                     extent=[radius[0,0], radius[0,-1], int(time[0,0]), int(time[-1,0])], 
                     aspect='auto', origin='lower')
 cbar = fig.colorbar(heatmap)
 plt.plot(convective_boundary, time[:,0], 'k', lw=2)
+plt.xlim(radius[0,0], radius[0,-1])
 plt.ylim(time[0,0], time[-1,0])
-plt.xlabel("Radius [-]")
+plt.xlabel("Radius [km]")
 plt.ylabel("Time [Ma]")
 plt.savefig(fig_folder+basename+"-2D-temperature-map.eps", format='eps', bbox_inches='tight')
 plt.close()
 
 # FIG2. selection of temperature and conductivity profiles
-fig, ((ax1, ax2), (ax3, ax4), (ax5, ax6)) = plt.subplots(3, 2, figsize=(8,8))
+fig, ((ax1, ax2), (ax3, ax4), (ax5, ax6)) = plt.subplots(3, 2, figsize=(10,10))
     
 for number in range(N):
 
@@ -78,18 +79,23 @@ for number in range(N):
     cond = conductivity[idx, :]
     ad = adiabat[idx, :]*1000
     # TODO: generalize this
-    dtemp = np.append(np.array([0]), np.diff(temp))/(3480e3/grid_size)*1000
+    dtemp = np.append(np.array([0]), np.diff(temp))/(rad[-1]/grid_size)*1000
 
     LABEL = "Time: "+"{:.0f}".format(time[idx,0])+" Ma"
 
-    ax1.plot(rad, temp, label=LABEL)
-    ax2.plot(rad, cond/1e-5, label=LABEL)
+    ax1.plot(rad, temp, label=LABEL, lw=2)
+    ax2.plot(rad, cond/1e-5, label=LABEL, lw=2)
 
-    ax3.plot(rad, -ad, label=LABEL)
-    ax4.plot(rad, dtemp, label=LABEL)
+    ax3.plot(rad, -ad, label=LABEL, lw=2)
+    ax4.plot(rad, dtemp, label=LABEL, lw=2)
 
-ax5.plot(time[:,0], qcmb[:,0])
+ax5.plot(time[:,0], qcmb[:,0], lw=2)
 ax5.set_xlim(time[0,0], time[-1,0])
+
+ax1.set_xlim(rad[0], rad[-1])
+ax2.set_xlim(rad[0], rad[-1])
+ax3.set_xlim(rad[0], rad[-1])
+ax4.set_xlim(rad[0], rad[-1])
 
 ax1.set_ylabel('Temperature [K]')
 ax2.set_ylabel('Diffusivity [1e-5 m$^2$/s]')
@@ -97,10 +103,10 @@ ax3.set_ylabel('Adiabatic gradient [K/km]')
 ax4.set_ylabel('Temperature gradient [K/km]')
 ax5.set_ylabel('CMB heat flow [TW]')
 
-ax1.set_xlabel('Radius [-]')
-ax2.set_xlabel('Radius [-]')
-ax3.set_xlabel('Radius [-]')
-ax4.set_xlabel('Radius [-]')
+ax1.set_xlabel('Radius [km]')
+ax2.set_xlabel('Radius [km]')
+ax3.set_xlabel('Radius [km]')
+ax4.set_xlabel('Radius [km]')
 ax5.set_xlabel('Time [Ma]')
 
 ax1.grid()
