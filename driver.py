@@ -4,6 +4,7 @@ import logging
 import threading
 import yaml
 import os
+import numpy as np
 
 
 
@@ -26,16 +27,19 @@ def generate_config(i):
     '''Example of config generation. Anything can be done here, the point is just
     to generate a new config.yaml file for each run.'''
 
+    config['snapshot'] = 1
+    
     ## # if varying mantle temperature
     ## TM = 4000+100*int(i)
     ## config['run_name'] = 'earth-Tc%d' % TM
     ## config['mantle_temperature'] = TM
 
-    diffusivity = (1.+float(i))*1.e-6
+ 
+    diffusivity = (0.5+float(i)/2.)*1.e-5
     config['run_name'] =  'earth-diff%.1e' %diffusivity
     config["constant_diff"] = "True"
     config["constant_diff_value"] = diffusivity
-    config["tbl_conductivity"] = 5. 
+    config["tbl_conductivity"] = 10. 
 
     stream = file('config.yaml', 'w')
     yaml.dump(config, stream)
