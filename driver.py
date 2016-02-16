@@ -31,11 +31,11 @@ def generate_config(i):
     ## config['run_name'] = 'earth-Tc%d' % TM
     ## config['mantle_temperature'] = TM
 
-    diffusivity = (0.5+int(i)/2.)*1.e-5
+    diffusivity = (1.+float(i))*1.e-6
     config['run_name'] =  'earth-diff%.1e' %diffusivity
     config["constant_diff"] = "True"
     config["constant_diff_value"] = diffusivity
-    config["tbl_conductivity"] = 10. 
+    config["tbl_conductivity"] = 5. 
 
     stream = file('config.yaml', 'w')
     yaml.dump(config, stream)
@@ -55,7 +55,7 @@ def worker(s, pool):
 
 # batch run information
 PARALLEL_JOBS = 3   # max number of parallel jobs
-TOTAL_RUNS = 11     # total number of runs in the series
+TOTAL_RUNS = 20     # total number of runs in the series
 
 # null pointer to discard direct code output
 FNULL = open(os.devnull, "w")
