@@ -1,12 +1,12 @@
 ---
-run_name: testrun           # will prefix every output
+run_name: test-2           # will prefix every output
 
 # Physical properties
 body: earth                 # decide which initial profiles to use
 core_radius: 3480           # in km // could actually be read from file
-kinematic_visc: 1e5         # fudge parameter?
-mantle_temperature: 4500    # in K, kept constant
-tbl_thickness: 100          # in km, thermal boundary layer thickness
+kinematic_visc: 1e7         # fudge parameter?
+mantle_temperature: 4000    # in K, kept constant
+tbl_thickness: 200          # in km, thermal boundary layer thickness
 tbl_conductivity: 5         # in W/m/K
 
 constant_diff: false         #
