@@ -1,3 +1,9 @@
+#!/usr/local/bin/python
+# Time-stamp: <2016-02-25 11:45:29 marine>
+
+
+# be careful not to modify this file while it is being run! It will call the functions you've modified, not consider the functions defined at the time it was called. 
+
 import subprocess
 import time
 import logging
@@ -34,12 +40,19 @@ def generate_config(i):
     ## config['run_name'] = 'earth-Tc%d' % TM
     ## config['mantle_temperature'] = TM
 
- 
-    diffusivity = (0.5+float(i)/2.)*1.e-5
-    config['run_name'] =  'earth-diff%.1e' %diffusivity
+    Nd = 20
+    Nm = 20
+    diffusivity = np.linspace(0.05e-5, 4e-5, Nd) #(0.5+float(i)/2.)*1.e-5
+    mantle_temperature = np.linspace(2500, 6000, Nm)
+
+    
     config["constant_diff"] = "True"
-    config["constant_diff_value"] = diffusivity
-    config["tbl_conductivity"] = 10. 
+    config["constant_diff_value"] = float(diffusivity[int(i)/Nd])
+    config["tbl_conductivity"] = 10.
+    config["mantle_temperature"] = float(mantle_temperature[int(i)%Nm])
+    print "run ", i, "parameters: ", config["mantle_temperature"], config["constant_diff_value"]
+    
+    config['run_name'] =  'earth-Tm%.2e-diff%.2e' %(config["mantle_temperature"], config["constant_diff_value"])
 
     stream = file('config.yaml', 'w')
     yaml.dump(config, stream)
@@ -59,7 +72,7 @@ def worker(s, pool):
 
 # batch run information
 PARALLEL_JOBS = 3   # max number of parallel jobs
-TOTAL_RUNS = 20     # total number of runs in the series
+TOTAL_RUNS = 400     # total number of runs in the series
 
 # null pointer to discard direct code output
 FNULL = open(os.devnull, "w")

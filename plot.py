@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-02-16 13:30:46 marine>
+# Time-stamp: <2016-02-26 08:39:24 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : plot output.
 # Author : Matthieu Laneuville, Marine Lasbleis
@@ -159,7 +159,7 @@ def append_ifconvective(out_folder, info, t, status):
 
     if not os.path.isfile(out_folder+"convect.txt"):
         with open(out_folder+"convect.txt", "a") as myfile:
-            myfile.write("code - body - TBL thickness - TBL conductivity - Kin viscosity - Mantle T - Diff value - Time max - Status convection - Onset convection\n")        # Append text in a file            
+            myfile.write("# code - body - TBL thickness - TBL conductivity - Kin viscosity - Mantle T - Diff value - Time max - Status convection - Onset convection\n")        # Append text in a file            
     with open(out_folder+"convect.txt", "a") as myfile:
         myfile.write('%s %s %02.3e %02.3f %02.2e %02.3e %02.4e %02.2f %s %2.2f\n'%(info['code revision'], info['target body'], info['TBL thickness'], info['TBL conductivity'], info['Kinematic visc'], info['Mantle temperature'], info['Diffusivity value'], t, status[0], status[1]))
 
@@ -174,9 +174,11 @@ def if_convective(R, boundary, t):
         status = "no-convection"
         start = 0.
     else:
-        if convect[-1]==boundary.shape[0]:
+        if convect[-1]==boundary.shape[0]-1:
             status = "convective"
             start = t[convect[0]]
+
+            
         else:
             status = "transient"
             start = t[convect[0]]
@@ -203,10 +205,8 @@ if __name__ == '__main__':
     num_tstep, radius, time, temperature, conductivity, adiabat, qcmb, convect = read_data_from_file(basename, grid_size, out_folder)
     map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
     figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
-
-
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
-    print 'Status of convection: %s. Convection start at %2.2f'%status_convection
+    print 'Status of convection: %s. Convection starts at %2.2f'%status_convection
     
     if INFO["Constant diffusivity"]:
         append_ifconvective(out_folder, INFO, time[-1], status_convection)
