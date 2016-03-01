@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-03-01 15:05:34 marine>
+# Time-stamp: <2016-03-01 15:08:42 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : plot output.
 # Author : Matthieu Laneuville, Marine Lasbleis
@@ -159,9 +159,9 @@ def append_ifconvective(out_folder, info, t, status):
 
     if not os.path.isfile(out_folder+"convect.txt"):
         with open(out_folder+"convect.txt", "a") as myfile:
-            myfile.write("# code - body - TBL thickness - TBL conductivity - Kin viscosity - Mantle T - Diff value - Time max - Status convection - Onset convection\n")        # Append text in a file            
+            myfile.write("# code - body - TBL thickness - TBL conductivity - Kin viscosity - Mantle T - Diff value - Time max - Status convection - Onset convection -- Duration convection\n")        # Append text in a file            
     with open(out_folder+"convect.txt", "a") as myfile:
-        myfile.write('%s %s %02.3e %02.3f %02.2e %02.3e %02.4e %02.2f %s %2.2f\n'%(info['code revision'], info['target body'], info['TBL thickness'], info['TBL conductivity'], info['Kinematic visc'], info['Mantle temperature'], info['Diffusivity value'], t, status[0], status[1]))
+        myfile.write('%s %s %02.3e %02.3f %02.2e %02.3e %02.4e %02.2f %s %2.2f %2.2f\n'%(info['code revision'], info['target body'], info['TBL thickness'], info['TBL conductivity'], info['Kinematic visc'], info['Mantle temperature'], info['Diffusivity value'], t, status[0], status[1],  status[2]))
 
     return
 
@@ -208,9 +208,9 @@ if __name__ == '__main__':
     map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
     figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
-    print 'Status of convection: %s'%(status_convection[0])
+    print 'Status of convection: %s.'%(status_convection[0])
     if status_convection[0]=="transient":
-        print "Convection was transient during  %2.2f"%status_convection[2]
+        print "Convection was transient during  %2.2f Ma."%status_convection[2]
 
     
     if INFO["Constant diffusivity"]:
