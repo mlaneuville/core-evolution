@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-02-26 08:39:24 marine>
+# Time-stamp: <2016-03-01 15:05:34 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : plot output.
 # Author : Matthieu Laneuville, Marine Lasbleis
@@ -172,18 +172,20 @@ def if_convective(R, boundary, t):
 
     if convect.shape[0]==0:
         status = "no-convection"
-        start = 0.
+        stop = 0.
+        total_time = 0.
     else:
         if convect[-1]==boundary.shape[0]-1:
             status = "convective"
-            start = t[convect[0]]
-
+            stop = t[convect[-1]]
+            total_time = t[-1] - t[convect[0]]
             
         else:
             status = "transient"
-            start = t[convect[0]]
+            stop = t[convect[-1]]
+            total_time = t[convect[-1]]-t[convect[0]]
 
-    return status, start
+    return status, stop, total_time
 
 if __name__ == '__main__':
 
@@ -206,7 +208,10 @@ if __name__ == '__main__':
     map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
     figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
-    print 'Status of convection: %s. Convection starts at %2.2f'%status_convection
+    print 'Status of convection: %s'%(status_convection[0])
+    if status_convection[0]=="transient":
+        print "Convection was transient during  %2.2f"%status_convection[2]
+
     
     if INFO["Constant diffusivity"]:
         append_ifconvective(out_folder, INFO, time[-1], status_convection)
