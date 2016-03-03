@@ -1,6 +1,5 @@
 #!/usr/local/bin/python
 # Time-stamp: <2016-03-01 15:47:05 marine>
-=======
 # Project : Thermal evolution of stratified core
 # Subproject : plot output.
 # Author : Matthieu Laneuville, Marine Lasbleis
