@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-02-26 08:39:24 marine>
+# Time-stamp: <2016-03-01 15:47:05 marine>
 # Project : Thermal evolution of stratified core
 # Subproject : plot output.
 # Author : Matthieu Laneuville, Marine Lasbleis
@@ -79,7 +79,7 @@ def map_temperature(radius, time, temperature, convect, figname):
     plt.ylim(time[0], time[-1])
     plt.xlabel("Radius [km]")
     plt.ylabel("Time [Ma]")
-    plt.savefig(figname+"-2D-temperature-map.eps", format='eps', bbox_inches='tight')
+    plt.savefig(figname+"-2D-temperature-map.pdf", format='pdf', bbox_inches='tight')
     plt.close()
 
     return
@@ -149,7 +149,7 @@ def figures_profiles(N, radius, temperature, conductivity, adiabat, time, fignam
     #ax1.legend(loc=0)
     plt.tight_layout()
     #plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
-    plt.savefig(figname+"-1D-profiles.eps", format='eps', bbox_inches='tight')
+    plt.savefig(figname+"-1D-profiles.pdf", format='pdf', bbox_inches='tight')
     plt.close()
     
     return
@@ -159,9 +159,9 @@ def append_ifconvective(out_folder, info, t, status):
 
     if not os.path.isfile(out_folder+"convect.txt"):
         with open(out_folder+"convect.txt", "a") as myfile:
-            myfile.write("# code - body - TBL thickness - TBL conductivity - Kin viscosity - Mantle T - Diff value - Time max - Status convection - Onset convection\n")        # Append text in a file            
+            myfile.write("# code - body - TBL thickness - TBL conductivity - Kin viscosity - Mantle T - Diff value - Time max - Status convection - Onset convection -- Duration convection\n")        # Append text in a file            
     with open(out_folder+"convect.txt", "a") as myfile:
-        myfile.write('%s %s %02.3e %02.3f %02.2e %02.3e %02.4e %02.2f %s %2.2f\n'%(info['code revision'], info['target body'], info['TBL thickness'], info['TBL conductivity'], info['Kinematic visc'], info['Mantle temperature'], info['Diffusivity value'], t, status[0], status[1]))
+        myfile.write('%s %s %02.3e %02.3f %02.2e %02.3e %02.4e %02.2f %s %2.2f %2.2f\n'%(info['code revision'], info['target body'], info['TBL thickness'], info['TBL conductivity'], info['Kinematic visc'], info['Mantle temperature'], info['Diffusivity value'], t, status[0], status[1],  status[2]))
 
     return
 
@@ -172,18 +172,20 @@ def if_convective(R, boundary, t):
 
     if convect.shape[0]==0:
         status = "no-convection"
-        start = 0.
+        stop = 0.
+        total_time = 0.
     else:
         if convect[-1]==boundary.shape[0]-1:
             status = "convective"
-            start = t[convect[0]]
-
+            stop = t[convect[-1]]
+            total_time = t[-1] - t[convect[0]]
             
         else:
             status = "transient"
-            start = t[convect[0]]
+            stop = t[convect[-1]]
+            total_time = t[convect[-1]]-t[convect[0]]
 
-    return status, start
+    return status, stop, total_time
 
 if __name__ == '__main__':
 
@@ -206,7 +208,10 @@ if __name__ == '__main__':
     map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
     figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
-    print 'Status of convection: %s. Convection starts at %2.2f'%status_convection
+    print 'Status of convection: %s.'%(status_convection[0])
+    if status_convection[0]=="transient":
+        print "Convection was transient during  %2.2f Ma."%status_convection[2]
+
     
     if INFO["Constant diffusivity"]:
         append_ifconvective(out_folder, INFO, time[-1], status_convection)

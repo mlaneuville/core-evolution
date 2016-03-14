@@ -40,15 +40,15 @@ def generate_config(i):
     ## config['run_name'] = 'earth-Tc%d' % TM
     ## config['mantle_temperature'] = TM
 
-    Nd = 20
-    Nm = 20
+    Nd = 10
+    Nm = 10
     diffusivity = np.linspace(0.05e-5, 4e-5, Nd) #(0.5+float(i)/2.)*1.e-5
     mantle_temperature = np.linspace(2500, 6000, Nm)
 
     
     config["constant_diff"] = "True"
     config["constant_diff_value"] = float(diffusivity[int(i)/Nd])
-    config["tbl_conductivity"] = 10.
+    config["tbl_conductivity"] = 15.
     config["mantle_temperature"] = float(mantle_temperature[int(i)%Nm])
     print "run ", i, "parameters: ", config["mantle_temperature"], config["constant_diff_value"]
     
@@ -72,7 +72,7 @@ def worker(s, pool):
 
 # batch run information
 PARALLEL_JOBS = 3   # max number of parallel jobs
-TOTAL_RUNS = 400     # total number of runs in the series
+TOTAL_RUNS = 100     # total number of runs in the series
 
 # null pointer to discard direct code output
 FNULL = open(os.devnull, "w")
