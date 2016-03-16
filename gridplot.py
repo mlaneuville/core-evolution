@@ -1,30 +1,29 @@
 #!/usr/local/bin/python
 # Time-stamp: <2016-03-01 15:09:53 marine>
 
-
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from matplotlib.mlab import griddata
-
+import pandas as pd
 
 if __name__ == "__main__":
 
     
 
-    filename = "./out/mantle_cond_10/convect.txt"
+    filename = "./out/summary/convect.txt"
 
-    dtype = "|S50" #"s40, s20, f8, f8, f8, f8, f8, f8, s20, f8" #  i8,f8,S5"# format
-    data = np.genfromtxt(filename, dtype = dtype)
+    names = ["code", "body", "TBL thickness", "TBL conductivity", "Kin viscosity", 
+             "Mantle T", "Diff value", "Time max", "Status convection", "Onset convection",
+             "Duration convection"]
+    df = pd.read_table(filename, sep=' ', names=names, skiprows=1)
+    dataset = df.sort(['Mantle T', 'Diff value'], ascending=[1, 1])
+    print dataset.info()
 
-    a, b = data.shape
-    print a, b
-
-    convectstatus = data[:, 8]
-    convecttime = data[:, 10]
-    TM = data[:, 5]
-    diff = data[:, 6]
-
-    # print diff
+    convectstatus = dataset["Status convection"]
+    convecttime = dataset["Duration convection"]
+    TM = dataset["Mantle T"]
+    diff = dataset["Diff value"]
 
     convection = []
     for a in convectstatus:
@@ -37,25 +36,29 @@ if __name__ == "__main__":
         else:
             print "problem"
 
-
-
-    scatterplot = plt.scatter(TM.astype(float), diff.astype(float)*1e4*800, c = convecttime.astype(float), s=100, cmap='gnuplot')
+    # scatter plot
+    scatterplot = plt.scatter(TM.astype(float), diff.astype(float)*1e4*800, c = convecttime.astype(float), s=100, cmap='jet')
     plt.xlabel("Mantle temperature (K)")
     plt.ylabel("Core conductivity (W/m/K)")
+    plt.xlim(TM.values.min(), TM.values.max())
+    plt.ylim(diff.values.min()*1e4*800, diff.values.max()*1e4*800)
     plt.colorbar(scatterplot)
-    plt.savefig("convect.eps", format='eps', bbox_inches='tight')
+    plt.savefig("convect1.eps", format='eps', bbox_inches='tight')
     plt.show()
 
+    # contourf plot
+    X, Y = np.meshgrid(TM.astype(float).unique(), diff.astype(float).unique()*1e4*800)
+    Z = np.transpose(convecttime.astype(float).reshape(len(TM.unique()), len(diff.unique())))
 
+    levels = [0, 250, 500, 750, 1000]
 
-    def grid(x, y, z, resX=100, resY=100):
-        "Convert 3 column data to matplotlib grid"
-        xi = np.linspace(min(x), max(x), resX)
-        yi = np.linspace(min(y), max(y), resY)
-        Z = griddata(x, y, z, xi, yi, interp="linear")
-        X, Y = np.meshgrid(xi, yi)
-        return X, Y, Z
+    CS1 = plt.contourf(X, Y, Z, levels, extend='min', cmap=cm.get_cmap("jet"))
+    plt.colorbar(CS1, label="Convective era duration [Ma]")
 
-    X, Y, Z = grid(TM.astype(float), diff.astype(float)*1e4*800, convecttime.astype(float))
-    plt.contourf(X, Y, Z, 100)
+    CS2 = plt.contour(X, Y, Z, levels, colors=('k',), linewidths=(3,))
+    plt.clabel(CS2, fmt='%2.1f', colors='k', fontsize=14)
+
+    plt.xlabel("Mantle temperature (K)")
+    plt.ylabel("Core conductivity (W/m/K)")
+    plt.savefig("convect2.eps", format='eps', bbox_inches='tight')
     plt.show()

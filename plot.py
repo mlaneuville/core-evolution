@@ -5,6 +5,7 @@
 # Author : Matthieu Laneuville, Marine Lasbleis
 
 import matplotlib.pyplot as plt
+from matplotlib import cm
 import numpy as np
 import sys
 import os.path
@@ -69,7 +70,7 @@ def map_temperature(radius, time, temperature, convect, figname):
     
     heatmap = ax.imshow(temperature, 
                         extent=[radius[0], radius[-1], int(time[0]), int(time[-1])], 
-                        aspect='auto', origin='lower')
+                        aspect='auto', origin='lower', cmap=cm.get_cmap('gnuplot'))
     
     cbar = fig.colorbar(heatmap)
     if np.shape(convective_boundary(radius, convect)) == np.shape(time):
@@ -205,8 +206,8 @@ if __name__ == '__main__':
     INFO = info_from_file(out_folder+basename+"-output.txt")
     grid_size = INFO["num_points"]
     num_tstep, radius, time, temperature, conductivity, adiabat, qcmb, convect = read_data_from_file(basename, grid_size, out_folder)
-    # map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
-    # figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
+    map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
+    figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
     print 'Status of convection: %s.'%(status_convection[0])
     if status_convection[0]=="transient":
