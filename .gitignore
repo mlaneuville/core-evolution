@@ -5,3 +5,5 @@ syntax: glob
 *.txt
 a.out
 *.eps
+*.pdf
+config.yaml
