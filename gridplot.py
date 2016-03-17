@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-03-17 15:34:10 marine>
+# Time-stamp: <2016-03-17 15:51:43 marine>
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -38,26 +38,19 @@ if __name__ == "__main__":
 
     age_max = max(dataset["Time max"])
 
-    convection = []
-    for i, a in enumerate(convectstatus):
-        if a =="no-convection":
-            convection.append(0)
-        elif a =="transient":
-            convection.append(1)
-        elif a == "convective":
-            convection.append(2)
-        else:
-            print "problem"
-    convection = np.array(convection)
-
-    mask_convection = convection == 2 #if convection is set for the whole time.
-   
-    
+    #mask_convection = convection == 2 #if convection is set for the whole time.
+    #convecttime[mask_convection] = age_max
 
     # scatter plot
-    for convecting_state in set(convection):
-        mask = (convection == convecting_state)
-        scatterplot = plt.scatter(TM[mask], diff[mask]*1e4*800, c = convecttime[mask], s=100, marker=(5,convecting_state), cmap='jet')
+    for convecting_state in set(convectstatus):
+        mask = (convectstatus == convecting_state)
+        if convecting_state == "no-convection":
+            marker = (5,0)
+        elif convecting_state == "transient":
+            marker = (5,1)
+        elif convecting_state == "convective":
+            marker = (5,2)
+        scatterplot = plt.scatter(TM[mask], diff[mask]*1e4*800, c = convecttime[mask], s=100, marker=marker, cmap=cm.get_cmap("gnuplot"))
     plt.xlabel("Mantle temperature (K)")
     plt.ylabel("Core conductivity (W/m/K)")
     plt.xlim(TM.values.min(), TM.values.max())
@@ -74,7 +67,7 @@ if __name__ == "__main__":
 
     levels = [0, 250, 500, 750, 1000]
 
-    CS1 = plt.contourf(X, Y, Z, levels, extend='min', cmap=cm.get_cmap("jet"))
+    CS1 = plt.contourf(X, Y, Z, levels, extend='min', cmap=cm.get_cmap("gnuplot"))
     plt.colorbar(CS1, label="Convective era duration [Ma]")
 
     CS2 = plt.contour(X, Y, Z, levels, colors=('k',), linewidths=(3,))
