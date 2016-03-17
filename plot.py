@@ -193,23 +193,28 @@ if __name__ == '__main__':
     fig_folder = "fig/"
     out_folder = "out/"
 
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         print "You have to specify the number of profiles and the name of the run."
         print "Usage: python "+sys.argv[0]+" <run_name> <num_profiles>"
         sys.exit()
     else:
-        basename = sys.argv[1]
-        N = int(sys.argv[2])
+        project_folder = sys.argv[1]
+        basename = sys.argv[2]
+        N = int(sys.argv[3])
         print basename, ", ", N, "profiles to display."
 
+    out_folder += project_folder+"/"
 
     INFO = info_from_file(out_folder+basename+"-output.txt")
     grid_size = INFO["num_points"]
     num_tstep, radius, time, temperature, conductivity, adiabat, qcmb, convect = read_data_from_file(basename, grid_size, out_folder)
+
     map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
     figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
+
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
     print 'Status of convection: %s.'%(status_convection[0])
+
     if status_convection[0]=="transient":
         print "Convection was transient during  %2.2f Ma."%status_convection[2]
 
