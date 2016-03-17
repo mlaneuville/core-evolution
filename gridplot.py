@@ -6,12 +6,17 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.mlab import griddata
 import pandas as pd
+import sys
 
 if __name__ == "__main__":
 
-    
+    if len(sys.argv) != 2:
+        print "Enter the name of the subfolder where convect.txt is stored"
+        print sys.argv[0]+" <folder>"
+        sys.exit() 
 
-    filename = "./out/summary/convect.txt"
+    folder = sys.argv[1]
+    filename = "./out/"+folder+"/convect.txt"
 
     names = ["code", "body", "TBL thickness", "TBL conductivity", "Kin viscosity", 
              "Mantle T", "Diff value", "Time max", "Status convection", "Onset convection",
