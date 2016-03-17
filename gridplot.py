@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-03-17 15:25:56 marine>
+# Time-stamp: <2016-03-17 15:34:10 marine>
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     age_max = max(dataset["Time max"])
 
     convection = []
-    for a in convectstatus:
+    for i, a in enumerate(convectstatus):
         if a =="no-convection":
             convection.append(0)
         elif a =="transient":
@@ -50,12 +50,14 @@ if __name__ == "__main__":
             print "problem"
     convection = np.array(convection)
 
+    mask_convection = convection == 2 #if convection is set for the whole time.
+   
+    
+
     # scatter plot
     for convecting_state in set(convection):
-
         mask = (convection == convecting_state)
-        
-        scatterplot = plt.scatter(TM.astype(float)[mask], diff.astype(float)[mask]*1e4*800, c = convecttime.astype(float)[mask], s=100, marker=(5,convecting_state), cmap='jet')
+        scatterplot = plt.scatter(TM[mask], diff[mask]*1e4*800, c = convecttime[mask], s=100, marker=(5,convecting_state), cmap='jet')
     plt.xlabel("Mantle temperature (K)")
     plt.ylabel("Core conductivity (W/m/K)")
     plt.xlim(TM.values.min(), TM.values.max())
@@ -66,8 +68,9 @@ if __name__ == "__main__":
         plt.show()
 
     # contourf plot
-    X, Y = np.meshgrid(TM.astype(float).unique(), diff.astype(float).unique()*1e4*800)
-    Z = np.transpose(convecttime.astype(float).reshape(len(TM.unique()), len(diff.unique())))
+    X, Y = np.meshgrid(TM.unique(), diff.unique()*1e4*800)
+    # the initial grid need to be perfectly ordered. (no holes)
+    Z = np.transpose(convecttime.reshape(len(TM.unique()), len(diff.unique())))
 
     levels = [0, 250, 500, 750, 1000]
 
