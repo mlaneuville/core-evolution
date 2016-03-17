@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-03-17 17:37:14 marine>
+# Time-stamp: <2016-03-17 17:47:45 marine>
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,16 +36,14 @@ if __name__ == "__main__":
 
     
 # TO DO : if panda is used, it may be better to use it as a full dataset (no split it now with several columns)
-# if not, then be careful that all the vectors below are actually pandas DataFrame and not numpy array!
+# if not, then be careful that all the vectors below are actually pandas class DataFrame and not numpy array!
 
     convectstatus = dataset["Status convection"]
     convecttime = dataset["Duration convection"]
     TM = dataset["Mantle T"]
     diff = dataset["Diff value"]
 
-    age_max = max(dataset["Time max"])
-
-
+    print type(diff)
 
     # scatter plot
     for convecting_state in set(convectstatus):
@@ -71,7 +69,7 @@ if __name__ == "__main__":
     # the initial grid need to be perfectly ordered. (no holes)
     Z = np.transpose(convecttime.reshape(len(TM.unique()), len(diff.unique())))
 
-    levels = [0, 250, 500, 750, 1000]
+    levels = [0, 250, 500, 750, 1000] #TO DO: add an automatic way to have 4 or 5 levels? 
 
     CS1 = plt.contourf(X, Y, Z, levels, extend='min', cmap=cm.get_cmap("gnuplot"))
     plt.colorbar(CS1, label="Convective era duration [Ma]")
