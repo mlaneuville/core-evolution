@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-03-01 15:09:53 marine>
+# Time-stamp: <2016-03-17 15:25:56 marine>
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,19 +36,26 @@ if __name__ == "__main__":
     TM = dataset["Mantle T"]
     diff = dataset["Diff value"]
 
+    age_max = max(dataset["Time max"])
+
     convection = []
     for a in convectstatus:
-        if a == "convective":
-            convection.append(1)
-        elif a =="no-convection":
+        if a =="no-convection":
             convection.append(0)
         elif a =="transient":
+            convection.append(1)
+        elif a == "convective":
             convection.append(2)
         else:
             print "problem"
+    convection = np.array(convection)
 
     # scatter plot
-    scatterplot = plt.scatter(TM.astype(float), diff.astype(float)*1e4*800, c = convecttime.astype(float), s=100, cmap='jet')
+    for convecting_state in set(convection):
+
+        mask = (convection == convecting_state)
+        
+        scatterplot = plt.scatter(TM.astype(float)[mask], diff.astype(float)[mask]*1e4*800, c = convecttime.astype(float)[mask], s=100, marker=(5,convecting_state), cmap='jet')
     plt.xlabel("Mantle temperature (K)")
     plt.ylabel("Core conductivity (W/m/K)")
     plt.xlim(TM.values.min(), TM.values.max())
