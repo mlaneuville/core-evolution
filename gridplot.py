@@ -6,17 +6,23 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.mlab import griddata
 import pandas as pd
+import argparse
 import sys
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 2:
-        print "Enter the name of the subfolder where convect.txt is stored"
-        print sys.argv[0]+" <folder>"
-        sys.exit() 
+    basename = "out/"
 
-    folder = sys.argv[1]
-    filename = "./out/"+folder+"/convect.txt"
+    parser = argparse.ArgumentParser(description="Script to make a grid-plot from processed output.")
+    parser.add_argument('-s', '--sub', type=str, help="subfolder name in which to search for convect.txt")
+    parser.add_argument('-f', '--to_file', action='store_true', default=False, help="if set, will only write to file")
+
+    args = parser.parse_args()
+
+    if args.sub:
+        basename += args.sub+"/"
+
+    filename = basename+"/convect.txt"
 
     names = ["code", "body", "TBL thickness", "TBL conductivity", "Kin viscosity", 
              "Mantle T", "Diff value", "Time max", "Status convection", "Onset convection",
@@ -48,8 +54,9 @@ if __name__ == "__main__":
     plt.xlim(TM.values.min(), TM.values.max())
     plt.ylim(diff.values.min()*1e4*800, diff.values.max()*1e4*800)
     plt.colorbar(scatterplot)
-    plt.savefig("convect1.eps", format='eps', bbox_inches='tight')
-    plt.show()
+    plt.savefig(basename+"convect-scatter.eps", format='eps', bbox_inches='tight')
+    if not args.to_file:
+        plt.show()
 
     # contourf plot
     X, Y = np.meshgrid(TM.astype(float).unique(), diff.astype(float).unique()*1e4*800)
@@ -65,5 +72,6 @@ if __name__ == "__main__":
 
     plt.xlabel("Mantle temperature (K)")
     plt.ylabel("Core conductivity (W/m/K)")
-    plt.savefig("convect2.eps", format='eps', bbox_inches='tight')
-    plt.show()
+    plt.savefig(basename+"convect-contourf.eps", format='eps', bbox_inches='tight')
+    if not args.to_file:
+        plt.show()
