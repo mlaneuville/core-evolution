@@ -9,6 +9,7 @@ from matplotlib import cm
 import numpy as np
 import sys
 import os.path
+import argparse
 
 
 
@@ -193,24 +194,28 @@ if __name__ == '__main__':
     fig_folder = "fig/"
     out_folder = "out/"
 
-    if len(sys.argv) != 4:
-        print "You have to specify the number of profiles and the name of the run."
-        print "Usage: python "+sys.argv[0]+" <run_name> <num_profiles>"
-        sys.exit()
-    else:
-        project_folder = sys.argv[1]
-        basename = sys.argv[2]
-        N = int(sys.argv[3])
-        print basename, ", ", N, "profiles to display."
+    parser = argparse.ArgumentParser(description="Script to visualise output from C++ program.")
+    parser.add_argument('name', type=str, help="name of the run without -output.txt")
+    parser.add_argument('-s', '--sub', type=str, help="subfolder name (should be in out/")
+    parser.add_argument('-n', '--npro', type=int, help="number of profiles (default=3)", default=3)
+    parser.add_argument('--no_output', action='store_true', help="only assess convective status", default=False)
 
-    out_folder += project_folder+"/"
+    args = parser.parse_args()
+
+    basename = args.name
+    if args.npro:
+        N = args.npro
+
+    if args.sub:
+        out_folder += args.sub+"/"
 
     INFO = info_from_file(out_folder+basename+"-output.txt")
     grid_size = INFO["num_points"]
     num_tstep, radius, time, temperature, conductivity, adiabat, qcmb, convect = read_data_from_file(basename, grid_size, out_folder)
 
-    map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
-    figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
+    if not args.no_output:
+        map_temperature(radius, time, temperature, convect, figname=fig_folder+basename)
+        figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
 
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
     print 'Status of convection: %s.'%(status_convection[0])
