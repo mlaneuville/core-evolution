@@ -12,6 +12,7 @@ using namespace std;
 
 string run_name = "testrun";
 string body = "earth";
+string subfolder = "";
 bool full_convecting = true;
 
 bool constant_diff = false;

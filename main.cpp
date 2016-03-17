@@ -273,7 +273,7 @@ void Simulation::run()
     initialize();
 
     ostringstream fname2;
-    fname2 << "out/" << run_name << "-output.txt";
+    fname2 << "out/" << subfolder << "/" << run_name << "-output.txt";
     FILE *f = fopen(fname2.str().c_str(), "w"); // make sure we don't append to an old file
     write_params_to_file(f);
     fclose(f);
@@ -338,6 +338,9 @@ void Simulation::load_config(string fname)
 
 int main(int argc, char **argv)
 {
+    if(argc != 2) {exit(0);}
+    subfolder = argv[1];
+
     Simulation s;
     s.load_config("config.yaml");
     s.run();

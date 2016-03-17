@@ -11,6 +11,7 @@ import threading
 import yaml
 import os
 import numpy as np
+import argparse
 
 
 
@@ -57,18 +58,26 @@ def generate_config(i):
     stream = file('config.yaml', 'w')
     yaml.dump(config, stream)
 
-def worker(s, pool):
+def worker(s, pool, folder):
     name = threading.currentThread().getName()
     logging.debug('Worker %02d waiting to join the pool' % int(name))
     with s:
         generate_config(name)
         pool.makeActive(name)
-        subprocess.call(['./a.out'], stdout=FNULL)
+        subprocess.call(['./a.out', folder], stdout=FNULL)
         pool.makeInactive(name)
 
         
 
+parser = argparse.ArgumentParser(description="Script to start a series of runs.")
+parser.add_argument('-s', '--sub', type=str, default="", help="subfolder name in which to store outputs")
+args = parser.parse_args()
 
+folder = "out/"
+
+if args.sub:
+    folder += args.sub+"/"
+    subprocess.call(['mkdir', '-p', folder])
 
 # batch run information
 PARALLEL_JOBS = 3   # max number of parallel jobs
@@ -90,6 +99,6 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s (%(threadName)-2s) 
 pool = ActivePool()
 s = threading.Semaphore(PARALLEL_JOBS)
 for i in range(TOTAL_RUNS):
-    t = threading.Thread(target=worker, name=str(i), args=(s, pool))
+    t = threading.Thread(target=worker, name=str(i), args=(s, pool, args.sub))
     time.sleep(0.2) # to avoid workers overwriting each other's config file
     t.start()
