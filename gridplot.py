@@ -1,5 +1,5 @@
 #!/usr/local/bin/python
-# Time-stamp: <2016-03-17 15:51:43 marine>
+# Time-stamp: <2016-03-17 17:37:14 marine>
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,6 +31,13 @@ if __name__ == "__main__":
     dataset = df.sort(['Mantle T', 'Diff value'], ascending=[1, 1])
     print dataset.info()
 
+    age_max = max(dataset["Time max"])
+    dataset.ix[dataset["Status convection"]=="convective", 'Duration convection'] = age_max #set age_max for all the lines where there is full convection.
+
+    
+# TO DO : if panda is used, it may be better to use it as a full dataset (no split it now with several columns)
+# if not, then be careful that all the vectors below are actually pandas DataFrame and not numpy array!
+
     convectstatus = dataset["Status convection"]
     convecttime = dataset["Duration convection"]
     TM = dataset["Mantle T"]
@@ -38,8 +45,7 @@ if __name__ == "__main__":
 
     age_max = max(dataset["Time max"])
 
-    #mask_convection = convection == 2 #if convection is set for the whole time.
-    #convecttime[mask_convection] = age_max
+
 
     # scatter plot
     for convecting_state in set(convectstatus):
