@@ -163,7 +163,7 @@ if __name__ == '__main__':
     # name of the data file (default: earth.dat)
     if len(sys.argv)>1:
         Names = [sys.argv[1]]
-    else: Names = ['earth', 'mars', 'vesta', 'venus']
+    else: Names = ['earth', 'earth_0.5', 'mars', 'vesta', 'venus']
 
     Npoints = 200
     folder = "./dat/"
