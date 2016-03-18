@@ -217,7 +217,12 @@ void Simulation::iterate(double time)
     dt = 0.01*pow(dx,2)/kmax;
     // the heat flow from the top shell to the core should not be more than 10x
     // typical conducting heat flow
-    double dt_boundary = 10*5e3*cp*1e-2*shell_volume/calculate_heat_flow();
+    double dt_boundary = dt;
+
+    if (calculate_heat_flow() > 1e8)
+        // this condition is valid only when the heat flow is large enough
+        // as calculate_heat_flow() tends towards 0, dt would become infinite.
+        dt_boundary = 10*5e3*cp*1e-2*shell_volume/calculate_heat_flow();
 
     if (dt_boundary < dt) dt = dt_boundary;
 
