@@ -16,6 +16,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script to make a grid-plot from processed output.")
     parser.add_argument('-s', '--sub', type=str, help="subfolder name in which to search for convect.txt")
     parser.add_argument('-f', '--to_file', action='store_true', default=False, help="if set, will only write to file")
+    parser.add_argument('-n', '--nlevels', type=int, default=5, help="sets the number of level lines")
 
     args = parser.parse_args()
 
@@ -69,13 +70,14 @@ if __name__ == "__main__":
     # the initial grid need to be perfectly ordered. (no holes)
     Z = np.transpose(convecttime.reshape(len(TM.unique()), len(diff.unique())))
 
-    levels = [0, 250, 500, 750, 1000] #TO DO: add an automatic way to have 4 or 5 levels? 
+    levels = np.linspace(0, 1000, args.nlevels)
+    levels = [int(x) for x in levels]
 
-    CS1 = plt.contourf(X, Y, Z, levels, extend='min', cmap=cm.get_cmap("gnuplot"))
+    CS1 = plt.contourf(X, Y, Z, levels, extend='min', cmap=cm.get_cmap("jet"))
     plt.colorbar(CS1, label="Convective era duration [Ma]")
 
     CS2 = plt.contour(X, Y, Z, levels, colors=('k',), linewidths=(3,))
-    plt.clabel(CS2, fmt='%2.1f', colors='k', fontsize=14)
+    #plt.clabel(CS2, fmt='%2.1f', colors='k', fontsize=14)
 
     plt.xlabel("Mantle temperature (K)")
     plt.ylabel("Core conductivity (W/m/K)")
