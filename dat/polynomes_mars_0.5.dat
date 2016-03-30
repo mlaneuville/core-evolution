@@ -1,0 +1,5 @@
+# Polynomial coefficients pour Temperature (K), Pressure (Pa), Gravity (m/s**2) as function of radius (m). Highest power first.
+-1.6971e-17 4.0775e-10 0.0000e+00
+2.3869e-10 -1.0757e-02 0.0000e+00
+0.0000e+00 0.0000e+00 2.1917e-06
+2.2326e+03 5.1233e+10 0.0000e+00
