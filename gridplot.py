@@ -64,6 +64,7 @@ if __name__ == "__main__":
     plt.savefig(basename+"convect-scatter.eps", format='eps', bbox_inches='tight')
     if not args.to_file:
         plt.show()
+    plt.close()
 
     # contourf plot
     X, Y = np.meshgrid(TM.unique(), diff.unique()*1e4*800)
