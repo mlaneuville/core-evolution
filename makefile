@@ -1,15 +1,28 @@
 #!/bin/bash
 
+BIN = evolve
+OBJ = main.o conductivity.o
+FLAGS = -ffast-math -O3 -lyaml-cpp -std=c++11
+
 REV = $(shell git rev-parse --verify HEAD)
 CC = g++
 INC = /usr/local/include
 LIB = /usr/local/lib
 
-a.out: conductivity.h conductivity.cpp main.h main.cpp
+$(BIN): revision.h $(OBJ) *.h
 	@rm -rf revision.h
 	@echo "string revision = \"$(REV)\";" > revision.h
-	$(CC) -O3 -ffast-math -I$(INC) -L$(LIB) -lyaml-cpp conductivity.cpp main.cpp
+	$(CC) -o $(BIN) $(OBJ) $(FLAGS)
 	@rm -rf revision.h
+
+revision.h:
+	@rm -rf revision.h
+	@echo "string revision = \"$(REV)\";" > revision.h
+
+$(OBJ): *.h
+
+.cpp.o:
+	$(CC) -c $*.cpp $(FLAGS)
 
 clean:
 	rm -rf *.txt
