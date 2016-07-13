@@ -28,8 +28,8 @@ def read_data_from_file(basename, grid_size=200, out_folder="out/", constantradi
     # TODO: grid_size should be read from file in future version
     data = np.genfromtxt(out_folder+basename+"-output.txt")
     num_tstep = data.shape[0]/grid_size
-    print "(grid_size, num_tstep) = (%d,%d)" % (grid_size, num_tstep)
-    print
+    print("(grid_size, num_tstep) = (%d,%d)" % (grid_size, num_tstep))
+    print()
 
     # read data from file
     # TODO: loading everything like this sounds like a terrible idea; can we improve? I don't think so...
@@ -96,7 +96,7 @@ def figures_profiles(N, radius, temperature, conductivity, adiabat, time, fignam
 
         idx = int(number*num_tstep*1./(N-1))
         idx = min(idx, num_tstep-1)
-        print "...", idx
+        print("...", idx)
 
         rad, temp, cond, ad = [], [], [], []
 
@@ -218,10 +218,10 @@ if __name__ == '__main__':
         figures_profiles(N, radius, temperature, conductivity, adiabat, time, figname=fig_folder+basename)
 
     status_convection = if_convective(radius[-2], convective_boundary(radius, convect), time)
-    print 'Status of convection: %s.'%(status_convection[0])
+    print('Status of convection: %s.'%(status_convection[0]))
 
     if status_convection[0]=="transient":
-        print "Convection was transient during  %2.2f Ma."%status_convection[2]
+        print("Convection was transient during  %2.2f Ma."%status_convection[2])
 
     
     if INFO["Constant diffusivity"]:

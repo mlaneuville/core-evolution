@@ -30,7 +30,7 @@ if __name__ == "__main__":
              "Duration convection"]
     df = pd.read_table(filename, sep=' ', names=names, skiprows=1)
     dataset = df.sort(['Mantle T', 'Diff value'], ascending=[1, 1])
-    print dataset.info()
+    print(dataset.info())
 
     age_max = max(dataset["Time max"])
     dataset.ix[dataset["Status convection"]=="convective", 'Duration convection'] = age_max #set age_max for all the lines where there is full convection.
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     TM = dataset["Mantle T"]
     diff = dataset["Diff value"]
 
-    print type(diff)
+    print(type(diff))
 
     # scatter plot
     for convecting_state in set(convectstatus):

@@ -41,8 +41,8 @@ def generate_config(i):
     ## config['run_name'] = 'earth-Tc%d' % TM
     ## config['mantle_temperature'] = TM
 
-    Nd = 10
-    Nm = 10
+    Nd = 5
+    Nm = 5
     diffusivity = np.linspace(0.05e-5, 4e-5, Nd) #(0.5+float(i)/2.)*1.e-5
     mantle_temperature = np.linspace(2500, 6000, Nm)
 
@@ -51,11 +51,11 @@ def generate_config(i):
     config["constant_diff_value"] = float(diffusivity[int(i)/Nd])
     config["tbl_conductivity"] = 15.
     config["mantle_temperature"] = float(mantle_temperature[int(i)%Nm])
-    print "run ", i, "parameters: ", config["mantle_temperature"], config["constant_diff_value"]
+    print("run ", i, "parameters: ", config["mantle_temperature"], config["constant_diff_value"])
     
     config['run_name'] =  'earth-Tm%.2e-diff%.2e' %(config["mantle_temperature"], config["constant_diff_value"])
 
-    stream = file('config.yaml', 'w')
+    stream = open('config.yaml', 'w')
     yaml.dump(config, stream)
 
 def worker(s, pool, folder):
@@ -64,7 +64,7 @@ def worker(s, pool, folder):
     with s:
         generate_config(name)
         pool.makeActive(name)
-        subprocess.call(['./a.out', folder], stdout=FNULL)
+        subprocess.call(['./evolve', folder], stdout=FNULL)
         pool.makeInactive(name)
 
         
@@ -81,14 +81,14 @@ if args.sub:
 
 # batch run information
 PARALLEL_JOBS = 3   # max number of parallel jobs
-TOTAL_RUNS = 100     # total number of runs in the series
+TOTAL_RUNS = 25     # total number of runs in the series
 
 # null pointer to discard direct code output
 FNULL = open(os.devnull, "w")
 
 # loads default config file structure
 
-stream = file("default.yaml", "r")
+stream = open("default.yaml", "r")
 config = yaml.load(stream)
 stream.close()
 
