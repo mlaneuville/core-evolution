@@ -79,6 +79,7 @@ void Simulation::read_profiles(string s)
                 i++;
             }
         }
+		cout << "Done reading from file" << endl;
     } else {
         cout << "Error reading data file! Please use {earth, mars, venus or vesta} as argument." << endl;
         exit(0);
@@ -101,6 +102,7 @@ double Simulation::get_diffusivity(int i)
 
 void Simulation::initialize(void)
 {
+	cout << "Initializing..." <<endl;
     gravity = (double*)malloc(num_points*sizeof(double));
     pressure = (double*)malloc(num_points*sizeof(double));
     T = (double*)malloc(num_points*sizeof(double));
@@ -125,6 +127,7 @@ void Simulation::initialize(void)
         K[i] = get_diffusivity(i);
     }
     kmax = get_diffusivity(num_points-1);
+	cout << "Done initializing!" << endl;
 }
 
 // Short-hand functions to compute temperature gradients.
@@ -279,8 +282,9 @@ void Simulation::run()
 
     ostringstream fname2;
     fname2 << "out/" << subfolder << "/" << run_name << "-output.txt";
-    FILE *f = fopen(fname2.str().c_str(), "w"); // make sure we don't append to an old file
-    write_params_to_file(f);
+	// TODO: this will segfault if subfolder does not exist!
+	FILE *f = fopen(fname2.str().c_str(), "w"); // make sure we don't append to an old file
+   	write_params_to_file(f);
     fclose(f);
 
     cout << "Iterates..." << endl;
