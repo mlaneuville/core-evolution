@@ -27,4 +27,5 @@ $(OBJ): *.h
 clean:
 	rm -rf *.txt
 	rm -rf *.log
+	rm -rf *.o
 	rm -rf a.out

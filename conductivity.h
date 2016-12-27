@@ -8,8 +8,8 @@ const double T0 = 1812;
 const double rho0 = 7010;
 const double K0 = 130e9;
 const double Kp0 = 4;
-const double alpha = 1e-5/exp(-0.400485*135/130);
-const double alphap = 130*log(2.)/(360-135);
+const double alpha = 1e-5 / exp(-0.400485 * 135 / 130);
+const double alphap = 130 * log(2.) / (360 - 135);
 const double cp = 750; // Gubbins et al 2003
 
 

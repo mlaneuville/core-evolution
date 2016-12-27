@@ -1,5 +1,5 @@
 ---
-run_name: test-2           # will prefix every output
+run_name: test-2            # will prefix every output
 
 # Physical properties
 body: earth                 # decide which initial profiles to use
@@ -9,7 +9,7 @@ mantle_temperature: 4000    # in K, kept constant
 tbl_thickness: 200          # in km, thermal boundary layer thickness
 tbl_conductivity: 5         # in W/m/K
 
-constant_diff: false         #
+constant_diff: true         #
 constant_diff_value: 2e-5   # im m2/s, if constant_diff=false, this won't be used
 
 # Simulation properties

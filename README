@@ -1,31 +1,40 @@
 Solves the diffusion equation in a sphere with variable diffusivity.
 
-### How-to
+## How-to
 
-The library `yaml-cpp` is required to use the configuration file. The library and instructions to install it can be found at https://github.com/jbeder/yaml-cpp
+#### Dependencies
 
-* Run `make` to prepare the executable file.
-* Copy `default.yaml` file to `config.yaml` and update that version (to keep default.yaml clean)
-* Then `./a.out` will run the simulation.
-* The output will be `<run_name>-output.txt`, and located in the `out` folder.
-* Code revision and relevant parameters are prepended to that file for future reference.
-
+The library `yaml-cpp` is required to use the configuration file. The library
+and instructions to install it can be found at https://github.com/jbeder/yaml-cpp
 
 To install yaml-cpp, OS X user can also use Homebrew:
 
 * brew install yaml-cpp
+
+#### Contributing
+
+Before commiting please run `astyle --options=.astylrc modified_file.cpp` on any
+C++ file that was modified. astyle can be found there http://astyle.sourceforge.net/
+
+#### Running a simulation
+
+* Run `make` to prepare the executable file.
+* Copy `default.yaml` file to `config.yaml` and update that version (to keep default.yaml clean)
+* Then `./evolve <folder>` will run the simulation (folder out/<run_name> has to exist)
+* The output will be `out/<folder>/<run_name>-output.txt`.
+* Code revision and relevant parameters are prepended to that file for future reference.
+
+#### Visualizing results
 
 Examples of direct gnuplot visualizations are:
 
 * `plot "output.txt" u 1:3 w l`
 * `plot "output.txt" u 1:2:3 w image`
 
+It is also possible to use a python script for visualisation. To run it: `python plot.py name`, where:
 
-### Visualisation using plot.py
-
-To run it: `python plot.py name N`, where:
-
-* N is the number of profiles you want (evenly split between t0 and tmax)
 * name is the `<run_name>` from which to read the data
+* -n is the number of profiles you want (evenly split between t0 and tmax)
+* -s <folder> is an optional parameter with the folder name (out/<folder>/)
 
 The figures are saved in the folder `fig`.
