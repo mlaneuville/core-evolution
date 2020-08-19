@@ -1,6 +1,6 @@
 #include "yaml-cpp/yaml.h"
 #include "main.h"
-#include "revision.h"
+#include "../revision.h"
 
 void Simulation::load_config(string fname)
 {

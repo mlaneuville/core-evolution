@@ -117,4 +117,3 @@ void print_kmap(void)
     }
     fclose(f);
 }
-
