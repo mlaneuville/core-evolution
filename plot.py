@@ -14,10 +14,9 @@ import argparse
 
 
 def info_from_file(filename):
-    
     with open(filename, 'r') as f:
         info = {}
-        for i in range(10): # the number of parameters
+        for i in range(6): # the number of parameters
             Line = f.readline()
             info.update(eval("{"+Line[1:]+"}"))
     return info
@@ -27,7 +26,7 @@ def read_data_from_file(basename, grid_size=200, out_folder="out/", constantradi
     # prepare data
     # TODO: grid_size should be read from file in future version
     data = np.genfromtxt(out_folder+basename+"-output.txt")
-    num_tstep = data.shape[0]/grid_size
+    num_tstep = int(data.shape[0]/grid_size)
     print("(grid_size, num_tstep) = (%d,%d)" % (grid_size, num_tstep))
     print()
 
@@ -66,19 +65,20 @@ def convective_boundary(radius, convect):
     
 def map_temperature(radius, time, temperature, convect, figname):
     """  FIG1. time, radius temperature map """
+    Ma = 1e6*365*24*3600
     
     fig, ax = plt.subplots(figsize=(12,8))
     
     heatmap = ax.imshow(temperature, 
-                        extent=[radius[0], radius[-1], int(time[0]), int(time[-1])], 
+                        extent=[radius[0], radius[-1], int(time[0]/Ma), int(time[-1])/Ma],
                         aspect='auto', origin='lower', cmap=cm.get_cmap('gnuplot'))
     
     cbar = fig.colorbar(heatmap)
-    if np.shape(convective_boundary(radius, convect)) == np.shape(time):
+    #if np.shape(convective_boundary(radius, convect)) == np.shape(time):
         # for some weird cases, there is one more point in the first array than in the second... TODO : check why.
-        plt.plot(convective_boundary(radius, convect), time[:], 'k', lw=2)
+    plt.plot(convective_boundary(radius, convect), time/Ma, 'k', lw=2)
     plt.xlim(radius[0], radius[-1])
-    plt.ylim(time[0], time[-1])
+    plt.ylim(time[0]/Ma, time[-1]/Ma)
     plt.xlabel("Radius [km]")
     plt.ylabel("Time [Ma]")
     plt.savefig(figname+"-2D-temperature-map.pdf", format='pdf', bbox_inches='tight')
@@ -202,7 +202,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    basename = args.name
+    basename = args.name + '-core'
     if args.npro:
         N = args.npro
 
@@ -224,8 +224,8 @@ if __name__ == '__main__':
         print("Convection was transient during  %2.2f Ma."%status_convection[2])
 
     
-    if INFO["Constant diffusivity"]:
-        append_ifconvective(out_folder, INFO, time[-1], status_convection)
+    #if INFO["Constant diffusivity"]:
+    #    append_ifconvective(out_folder, INFO, time[-1], status_convection)
 
 
  

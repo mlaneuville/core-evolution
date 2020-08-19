@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BIN = evolve
-OBJ = main.o conductivity.o
+OBJ = main.o conductivity.o core.o mantle.o fd1d_heat_steady.o
 FLAGS = -ffast-math -O3 -lyaml-cpp -std=c++11
 
 REV = $(shell git rev-parse --verify HEAD)
