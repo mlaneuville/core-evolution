@@ -1,18 +1,43 @@
----
-run_name: test-2            # will prefix every output
+{
+    run_name: test,            # will prefix every output
+    body: mars,                # decide which initial profiles to use
+    tmax: 4500,                # in Ma
+    snapshot: 10,              # snapshot interval, in Ma
 
-# Physical properties
-body: earth                 # decide which initial profiles to use
-core_radius: 3480           # in km // could actually be read from file
-kinematic_visc: 1e7         # fudge parameter?
-mantle_temperature: 4000    # in K, kept constant
-tbl_thickness: 200          # in km, thermal boundary layer thickness
-tbl_conductivity: 5         # in W/m/K
+    # mantle specific paramters
+    mantle:
+    {
+        initial_dtcore: 100,        # K
+        density: 3400,              # kg/m3
+        specific_heat: 1000,        # J/K/kg
+        cond_mantle: 4,             # W/m/K
+        cond_crust: 3,              # W/m/K
+        thermal_expansivity: 2e-5,  # 1/K
+        gravity: 3.7,               # m/s2
+        ref_viscosity: 2e19         # Pa s, ref at 1600 K
+    },
 
-constant_diff: true         #
-constant_diff_value: 2e-5   # im m2/s, if constant_diff=false, this won't be used
+    # core specific parameters
+    core:
+    {
+        num_points: 200,            # size of the grid
+        kinematic_visc: 1e7,        # fudge parameter?
+        specific_heat: 840,         # J/kg/K
+        constant_diff: true,        #
+        constant_diff_value: 1e-5,  # im m2/s, if constant_diff=false, this won't be used
+    },
 
-# Simulation properties
-num_points: 200             # size of the grid
-tmax: 1000                  # in Ma
-snapshot: 10                # snapshot interval, in Ma
+    # mars geometry
+    mars:
+    {
+        radius: 3390e3,              # in m
+        core_radius: 1550e3,         # in m
+    },
+
+    # earth geometry
+    earth:
+    {
+        radius: 6371e3,              # in m
+        core_radius: 3485e3,         # in m
+    },
+}

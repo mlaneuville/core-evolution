@@ -102,8 +102,6 @@ void Core::initialize(void)
             pressure[i] += cP[j] * pow(rad, polynom_order - j - 1);
         }
         T[i] = T_new[i];
-        T[i] = 2880;
-        T_new[i] = 2880;
         K[i] = get_diffusivity(i);
     }
     kmax = get_diffusivity(num_points - 1);

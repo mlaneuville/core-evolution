@@ -48,7 +48,7 @@ void Simulation::output(void)
 void Simulation::run(void)
 {
     double YEAR = 365*24*3600;
-    double tmax = 1000e6*YEAR;
+    double tmax = 500e6*YEAR;
     double dt = 1e4*YEAR;
     int last_out = 0;
     double snapshot = 1e7*YEAR;
