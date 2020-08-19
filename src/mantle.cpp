@@ -185,8 +185,11 @@ double Mantle::lithosdiffusion(void)
 
     x = r8vec_even(n, a, b);
     u = fd1d_heat_steady(n, a, b, ua, ub, k2, f2, x);
+    double q = 3*(u[0] - u[1])/dx;
+    delete x;
+    delete u;
 
-    return 3*(u[0] - u[1])/dx;
+    return q;
 }
 
 double Mantle::energylithos(double ql)
